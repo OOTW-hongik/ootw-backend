@@ -14,21 +14,25 @@ public class OAuthAttributes {
     private String nameAttributeKey;
     private String name;
     private String email;
-    private String picture;
 
-    public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
-        return ofKakao("id", attributes);
+    public static OAuthAttributes of(String socialName, String userNameAttributeName, Map<String, Object> attributes) {
+        // 카카오
+        if("kakao".equals(socialName)){
+            return ofKakao("id", attributes);
+        }
+
+        return null;
     }
 
     private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
-        Map<String, Object> response = (Map<String, Object>) attributes.get("kakao_account");
-        Map<String, Object> account = (Map<String, Object>) attributes.get("profile");
+        Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
+        Map<String, Object> kakaoProfile = (Map<String, Object>)kakaoAccount.get("profile");
 
         return OAuthAttributes.builder()
-                .name((String) account.get("nickname"))
-                .email((String) response.get("email"))
-                .attributes(response)
+                .name((String) kakaoProfile.get("nickname"))
+                .email((String) kakaoAccount.get("email"))
                 .nameAttributeKey(userNameAttributeName)
+                .attributes(attributes)
                 .build();
     }
 
@@ -36,7 +40,6 @@ public class OAuthAttributes {
         return Member.builder()
                 .name(name)
                 .email(email)
-                .picture(picture)
                 .role(Role.GUEST)
                 .build();
     }

@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.controller;
 
+import OOTWhongik.OOTW.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,9 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 
     @Operation(summary = "home", description = "home test")
-    @ApiResponse(responseCode = "200", description="ok")
     @GetMapping("/home")
-    public String home() {
-        return "home";
+    public Member home() {
+        return Member.builder()
+                .name("name")
+                .email("email")
+                .location("서울")
+                .build();
     }
+
 }

@@ -21,8 +21,6 @@ public class Member extends BaseTimeEntity {
     private String email;
     @Column
     private String location;
-    @Column
-    private String picture;
 
     @Enumerated(EnumType.STRING)
     @Column
@@ -31,9 +29,8 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<Clothes> clothesList;
 
-    public Member update(String name, String picture) {
+    public Member update(String name) {
         this.name = name;
-        this.picture = picture;
 
         return this;
     }
