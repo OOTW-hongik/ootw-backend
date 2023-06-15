@@ -41,6 +41,7 @@ public class OAuthAttributes {
                 .name(name)
                 .email(email)
                 .role(Role.GUEST)
+                .location("서울") // default 값을 일단 서울로 저장
                 .build();
     }
 }

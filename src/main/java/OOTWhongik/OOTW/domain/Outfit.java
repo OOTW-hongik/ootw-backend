@@ -35,7 +35,7 @@ public class Outfit extends BaseTimeEntity {
     private Long etcRating;
 
     private Long skyCondition;
-    private String comment;
+    private String outfitComment;
 
     @OneToMany(mappedBy = "outfit")
     private List<ClothesOutfit> clothesOutfitList;
