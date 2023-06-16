@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,6 +33,9 @@ public class Outfit extends BaseTimeEntity {
 
     private Long skyCondition;
     private String outfitComment;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private Member owner;
 
     @OneToMany(mappedBy = "outfit")
     private List<ClothesOutfit> clothesOutfitList;

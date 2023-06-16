@@ -29,6 +29,9 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<Clothes> clothesList;
 
+    @OneToMany(mappedBy = "member")
+    private List<Outfit> outfitList;
+
     public Member update(String name) {
         this.name = name;
 
