@@ -5,12 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class HomeDto {
+public class HomeResponse {
     private final String name;
     private final String location;
 
     @Builder
-    public HomeDto (Member member) {
+    public HomeResponse(Member member) {
         this.name = member.getName();
         this.location = member.getLocation();
     }

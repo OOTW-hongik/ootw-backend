@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,10 +27,12 @@ public class Member extends BaseTimeEntity {
     @Column
     private Role role;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "member")
     private List<Clothes> clothesList;
 
-    @OneToMany(mappedBy = "member")
+    @JsonBackReference
+    @OneToMany(mappedBy = "owner")
     private List<Outfit> outfitList;
 
     public Member update(String name) {

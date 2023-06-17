@@ -15,6 +15,7 @@ import java.util.List;
 public class Outfit extends BaseTimeEntity {
     @Id
     @Column(name = "outfit_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private LocalDateTime outfitDate;

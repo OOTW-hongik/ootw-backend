@@ -13,6 +13,7 @@ import javax.persistence.*;
 public class ClothesOutfit extends BaseTimeEntity {
     @Id
     @Column(name = "clothes_outfit_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
