@@ -15,7 +15,7 @@ public class OutfitRequest {
     private int highTemp;
     private int lowTemp;
     private int outerRating;
-    private int TopRating;
+    private int topRating;
     private int bottomRating;
     private int etcRating;
     private String outfitComment;

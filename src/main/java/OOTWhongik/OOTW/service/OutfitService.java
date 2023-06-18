@@ -11,13 +11,11 @@ import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
 import OOTWhongik.OOTW.repository.OutfitRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -39,6 +37,7 @@ public class OutfitService {
                 .highTemp(outfitRequest.getHighTemp())
                 .lowTemp(outfitRequest.getLowTemp())
                 .outerRating(outfitRequest.getOuterRating())
+                .topRating(outfitRequest.getTopRating())
                 .bottomRating(outfitRequest.getBottomRating())
                 .etcRating(outfitRequest.getEtcRating())
                 .outfitComment(outfitRequest.getOutfitComment())
