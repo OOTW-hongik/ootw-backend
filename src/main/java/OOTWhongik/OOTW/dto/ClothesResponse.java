@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class ClothesListDto {
+public class ClothesResponse {
     private final Long clothesId;
     private final String clothesUrl;
 }

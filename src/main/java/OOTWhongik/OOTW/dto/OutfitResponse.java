@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class OutfitListDto {
+public class OutfitResponse {
     private final Long outfitId;
     private final String outfitDate;
     private final int skyCondition;
@@ -24,7 +24,7 @@ public class OutfitListDto {
     private final boolean isManyBottom;
 
     @Builder
-    public OutfitListDto(Outfit outfit, String outerUrl, String topUrl, String bottomUrl, boolean isManyOuter, boolean isManyTop, boolean isManyBottom) {
+    public OutfitResponse(Outfit outfit, String outerUrl, String topUrl, String bottomUrl, boolean isManyOuter, boolean isManyTop, boolean isManyBottom) {
         this.outfitId = outfit.getId();
         this.outfitDate = outfit.getOutfitDate();
         this.skyCondition = outfit.getSkyCondition();

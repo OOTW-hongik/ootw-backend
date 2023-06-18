@@ -8,11 +8,11 @@ import java.util.List;
 @Getter
 public class ClosetResponse {
     private final List<String> subCategoryName;
-    private final List<ClothesListDto> clothesListDto;
+    private final List<ClothesResponse> clothesList;
 
     @Builder
-    public ClosetResponse(List<String> subCategoryName, List<ClothesListDto> clothesListDto) {
+    public ClosetResponse(List<String> subCategoryName, List<ClothesResponse> clothesResponse) {
         this.subCategoryName = subCategoryName;
-        this.clothesListDto = clothesListDto;
+        this.clothesList = clothesResponse;
     }
 }

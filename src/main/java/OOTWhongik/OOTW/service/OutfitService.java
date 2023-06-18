@@ -4,7 +4,7 @@ import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.domain.ClothesOutfit;
 import OOTWhongik.OOTW.domain.Member;
 import OOTWhongik.OOTW.domain.Outfit;
-import OOTWhongik.OOTW.dto.OutfitListDto;
+import OOTWhongik.OOTW.dto.OutfitResponse;
 import OOTWhongik.OOTW.dto.OutfitListResponse;
 import OOTWhongik.OOTW.dto.OutfitRequest;
 import OOTWhongik.OOTW.repository.ClothesRepository;
@@ -57,10 +57,11 @@ public class OutfitService {
 
     public OutfitListResponse getOutfitList(Long memberId) {
         String name = memberRepository.findById(memberId).get().getName();
-        List<Outfit> outfitList = outfitRepository.findAllByOwner(memberRepository.findById(memberId).get()).get();
-        List<OutfitListDto> outfitListDtoList= new ArrayList<>();
+        //List<Outfit> outfitList = outfitRepository.findAllByOwner(memberRepository.findById(memberId).get()).get();
+        List<Outfit> outfitList = memberRepository.findById(memberId).get().getOutfitList();
+        List<OutfitResponse> outfitListDtoResponse = new ArrayList<>();
         for (Outfit outfit : outfitList) {
-            OutfitListDto outfitListDto = OutfitListDto.builder()
+            OutfitResponse outfitResponseParam = OutfitResponse.builder()
                     .outfit(outfit)
                     .outerUrl("outerUrl")
                     .topUrl("topUrl")
@@ -69,8 +70,8 @@ public class OutfitService {
                     .isManyTop(false)
                     .isManyBottom(false)
                     .build();
-            outfitListDtoList.add(outfitListDto);
+            outfitListDtoResponse.add(outfitResponseParam);
         }
-        return new OutfitListResponse(name, outfitListDtoList);
+        return new OutfitListResponse(name, outfitListDtoResponse);
     }
 }

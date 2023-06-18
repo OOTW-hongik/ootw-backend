@@ -1,7 +1,7 @@
 package OOTWhongik.OOTW.controller;
 
 import OOTWhongik.OOTW.dto.HomeResponse;
-import OOTWhongik.OOTW.service.MemberService;
+import OOTWhongik.OOTW.service.HomeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 public class HomeController {
-    private final MemberService memberService;
+    private final HomeService homeService;
 
     @Operation(summary = "home", description = "home")
     @GetMapping("/home")
     public HomeResponse home(@RequestParam Long memberId) {
-        return memberService.getHome(memberId);
+        return homeService.getHome(memberId);
     }
 }

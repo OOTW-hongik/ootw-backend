@@ -3,7 +3,7 @@ package OOTWhongik.OOTW.service;
 import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.domain.Member;
 import OOTWhongik.OOTW.dto.ClosetResponse;
-import OOTWhongik.OOTW.dto.ClothesListDto;
+import OOTWhongik.OOTW.dto.ClothesResponse;
 import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +31,7 @@ public class ClosetService {
             throw new RuntimeException("등록된 옷이 없습니다.");
         }
         List<String> subCategoryCollection = new ArrayList<>();
-        List<ClothesListDto> clothesListDtoParam = new ArrayList<>();
+        List<ClothesResponse> clothesResponseParam = new ArrayList<>();
         for (Clothes clothes : clothesList) {
             //subcategory 가 있는지 검사하고 없으면 삽입
             if (!subCategoryCollection.contains(clothes.getSubcategory())) {
@@ -39,12 +39,12 @@ public class ClosetService {
             }
 
             //clothes 를 삽입
-            clothesListDtoParam.add(ClothesListDto.builder()
+            clothesResponseParam.add(ClothesResponse.builder()
                             .clothesId(clothes.getId())
                             .clothesUrl(clothes.getPhotoUrl())
                             .build());
         }
 
-        return new ClosetResponse(subCategoryCollection, clothesListDtoParam);
+        return new ClosetResponse(subCategoryCollection, clothesResponseParam);
     }
 }
