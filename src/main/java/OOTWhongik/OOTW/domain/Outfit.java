@@ -1,43 +1,49 @@
 package OOTWhongik.OOTW.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Outfit extends BaseTimeEntity {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "outfit_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime outfitDate;
-
+//    private LocalDateTime outfitDate;
+    private String outfitDate;
     private String outfit_location; // TODO: change String to enum
 
-    private Long highwc;
-    private Long lowwc;
-    private Long hightemp;
-    private Long lowtemp;
+    private int highWc;
+    private int lowWc;
+    private int highTemp;
+    private int lowTemp;
 
-    private Long outerRating;
-    private Long topRating;
-    private Long bottomRating;
-    private Long etcRating;
+    private int outerRating;
+    private int topRating;
+    private int bottomRating;
+    private int etcRating;
 
-    private Long skyCondition;
+    private int skyCondition;
     private String outfitComment;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Member owner;
 
-    @OneToMany(mappedBy = "outfit")
-    private List<ClothesOutfit> clothesOutfitList;
+    @OneToMany(mappedBy = "outfit", cascade = CascadeType.ALL)
+    private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
+
+    public void addClothesOutfit (ClothesOutfit clothesOutfit) {
+        clothesOutfitList.add(clothesOutfit);
+    }
 }

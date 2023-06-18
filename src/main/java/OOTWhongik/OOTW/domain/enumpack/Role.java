@@ -1,4 +1,4 @@
-package OOTWhongik.OOTW.domain;
+package OOTWhongik.OOTW.domain.enumpack;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,9 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Clothes extends BaseTimeEntity{
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "clothes_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String category;
@@ -36,5 +36,5 @@ public class Clothes extends BaseTimeEntity{
 
     @JsonBackReference
     @OneToMany(mappedBy = "clothes")
-    private List<ClothesOutfit> clothesOutfitList;
+    private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
 }

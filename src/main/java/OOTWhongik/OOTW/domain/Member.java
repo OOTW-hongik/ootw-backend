@@ -1,9 +1,11 @@
 package OOTWhongik.OOTW.domain;
 
+import OOTWhongik.OOTW.domain.enumpack.Role;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,8 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Member extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
     @Column
@@ -29,11 +30,11 @@ public class Member extends BaseTimeEntity {
 
     @JsonBackReference
     @OneToMany(mappedBy = "member")
-    private List<Clothes> clothesList;
+    private List<Clothes> clothesList = new ArrayList<>();
 
     @JsonBackReference
     @OneToMany(mappedBy = "owner")
-    private List<Outfit> outfitList;
+    private List<Outfit> outfitList = new ArrayList<>();
 
     public Member update(String name) {
         this.name = name;

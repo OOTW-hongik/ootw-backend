@@ -1,7 +1,7 @@
 package OOTWhongik.OOTW.config.auth.dto;
 
 import OOTWhongik.OOTW.domain.Member;
-import OOTWhongik.OOTW.domain.Role;
+import OOTWhongik.OOTW.domain.enumpack.Role;
 import lombok.Builder;
 import lombok.Getter;
 

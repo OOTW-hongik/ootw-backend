@@ -1,6 +1,7 @@
 package OOTWhongik.OOTW.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -8,12 +9,12 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class ClothesOutfit extends BaseTimeEntity {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "clothes_outfit_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
