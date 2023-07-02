@@ -1,4 +1,4 @@
-package OOTWhongik.OOTW.dto;
+package OOTWhongik.OOTW.dto.request;
 
 import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.repository.MemberRepository;

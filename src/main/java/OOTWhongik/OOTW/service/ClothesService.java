@@ -1,6 +1,6 @@
 package OOTWhongik.OOTW.service;
 
-import OOTWhongik.OOTW.dto.ClothesRequest;
+import OOTWhongik.OOTW.dto.request.ClothesRequest;
 import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;

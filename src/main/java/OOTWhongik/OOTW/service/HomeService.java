@@ -2,8 +2,8 @@ package OOTWhongik.OOTW.service;
 
 import OOTWhongik.OOTW.domain.Member;
 import OOTWhongik.OOTW.domain.Outfit;
-import OOTWhongik.OOTW.dto.HomeResponse;
-import OOTWhongik.OOTW.dto.OutfitResponse;
+import OOTWhongik.OOTW.dto.response.HomeResponse;
+import OOTWhongik.OOTW.dto.response.OutfitResponse;
 import OOTWhongik.OOTW.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

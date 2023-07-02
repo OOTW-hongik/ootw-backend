@@ -2,8 +2,8 @@ package OOTWhongik.OOTW.service;
 
 import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.domain.Member;
-import OOTWhongik.OOTW.dto.ClosetResponse;
-import OOTWhongik.OOTW.dto.ClothesResponse;
+import OOTWhongik.OOTW.dto.response.ClosetResponse;
+import OOTWhongik.OOTW.dto.response.ClothesResponse;
 import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -1,8 +1,7 @@
 package OOTWhongik.OOTW.controller;
 
-import OOTWhongik.OOTW.dto.HomeResponse;
-import OOTWhongik.OOTW.dto.OutfitListResponse;
-import OOTWhongik.OOTW.dto.OutfitRequest;
+import OOTWhongik.OOTW.dto.response.OutfitListResponse;
+import OOTWhongik.OOTW.dto.request.OutfitRequest;
 import OOTWhongik.OOTW.service.OutfitService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

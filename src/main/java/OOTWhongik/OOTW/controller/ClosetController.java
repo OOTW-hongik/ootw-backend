@@ -1,7 +1,7 @@
 package OOTWhongik.OOTW.controller;
 
-import OOTWhongik.OOTW.dto.ClosetResponse;
-import OOTWhongik.OOTW.dto.ClothesRequest;
+import OOTWhongik.OOTW.dto.response.ClosetResponse;
+import OOTWhongik.OOTW.dto.request.ClothesRequest;
 import OOTWhongik.OOTW.service.ClosetService;
 import OOTWhongik.OOTW.service.ClothesService;
 import com.fasterxml.jackson.core.JsonProcessingException;

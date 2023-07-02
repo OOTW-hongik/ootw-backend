@@ -1,6 +1,6 @@
 package OOTWhongik.OOTW.controller;
 
-import OOTWhongik.OOTW.dto.HomeResponse;
+import OOTWhongik.OOTW.dto.response.HomeResponse;
 import OOTWhongik.OOTW.service.HomeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

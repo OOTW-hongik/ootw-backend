@@ -1,4 +1,4 @@
-package OOTWhongik.OOTW.dto;
+package OOTWhongik.OOTW.dto.response;
 
 import OOTWhongik.OOTW.domain.Outfit;
 import lombok.Builder;

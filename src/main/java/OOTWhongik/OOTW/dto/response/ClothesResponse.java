@@ -1,4 +1,4 @@
-package OOTWhongik.OOTW.dto;
+package OOTWhongik.OOTW.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
