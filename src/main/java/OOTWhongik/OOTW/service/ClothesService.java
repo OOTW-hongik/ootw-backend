@@ -1,11 +1,16 @@
 package OOTWhongik.OOTW.service;
 
+import OOTWhongik.OOTW.domain.Clothes;
+import OOTWhongik.OOTW.domain.Photo;
 import OOTWhongik.OOTW.dto.request.ClothesRequest;
 import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 @Service
@@ -13,11 +18,16 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ClothesService {
     private final ClothesRepository clothesRepository;
+    private final PhotoService photoService;
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void saveClothes(ClothesRequest clothesRequest) {
-        clothesRepository.save(clothesRequest.toEntity(memberRepository));
+    public void saveClothes(ClothesRequest clothesRequest, MultipartFile file) throws IOException {
+        Clothes clothes = clothesRequest.toEntity(memberRepository); // 사진 아직 저장되지 않음
+        clothesRepository.save(clothes);
+        Photo photo = photoService.uploadPhoto(file, clothes.getId());
+        clothes.setPhoto(photo);
+        clothesRepository.save(clothes);
     }
 
 }

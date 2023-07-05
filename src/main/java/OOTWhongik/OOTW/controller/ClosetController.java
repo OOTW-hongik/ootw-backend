@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Tag(name = "closet", description = "closet")
 @RequiredArgsConstructor
@@ -27,8 +30,9 @@ public class ClosetController {
 
     @Operation(summary = "clothes creation", description = "옷 등록")
     @PostMapping("/clothes")
-    public ResponseEntity<?> saveClothes(@RequestBody ClothesRequest clothesRequest) {
-        clothesService.saveClothes(clothesRequest);
+    public ResponseEntity<?> saveClothes(@RequestPart ClothesRequest clothesRequest,
+                                         @RequestPart MultipartFile clothesPhoto) throws IOException {
+        clothesService.saveClothes(clothesRequest, clothesPhoto);
         return ResponseEntity.ok().build();
     }
 }

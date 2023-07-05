@@ -37,4 +37,12 @@ public class Clothes extends BaseTimeEntity{
     @JsonBackReference
     @OneToMany(mappedBy = "clothes")
     private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "photo_id")
+    private Photo photo;
+
+    public void setPhoto(Photo photo) {
+        this.photo = photo;
+    }
 }
