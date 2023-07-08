@@ -10,4 +10,5 @@ import lombok.RequiredArgsConstructor;
 public class ClothesResponse {
     private final Long clothesId;
     private final String clothesUrl;
+    private final String subCategory;
 }

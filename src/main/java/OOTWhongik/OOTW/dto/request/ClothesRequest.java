@@ -18,7 +18,6 @@ public class ClothesRequest {
                     .member(memberRepository.findById(memberId).get())
                     .category(category)
                     .subcategory(subCategory)
-                    .photoUrl(photoUrl)
                     .clothesComment(clothesComment)
                     .hidden(hidden)
                     .build();

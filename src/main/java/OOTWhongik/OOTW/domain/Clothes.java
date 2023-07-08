@@ -26,8 +26,6 @@ public class Clothes extends BaseTimeEntity{
 
     private String clothesComment;
 
-    private String photoUrl; // TODO: 실제 Photos entity 랑 매핑해야 함
-
     private boolean hidden;
 
     @ManyToOne

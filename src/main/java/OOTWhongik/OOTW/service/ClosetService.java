@@ -22,7 +22,7 @@ public class ClosetService {
     private final ClothesRepository clothesRepository;
     private final MemberRepository memberRepository;
 
-    public ClosetResponse getCloset(Long memberId, String category) throws JsonProcessingException {
+    public ClosetResponse getCloset(Long memberId, String category) {
         Member member = memberRepository.findById(memberId).get();
         List<Clothes> clothesList;
         if (clothesRepository.findAllByMemberAndCategory(member, category).isPresent()) {
@@ -38,10 +38,13 @@ public class ClosetService {
                 subCategoryCollection.add(clothes.getSubcategory());
             }
 
+            String photoUrl = clothes.getPhoto().getStoredFilePath();
+
             //clothes 를 삽입
             clothesResponseParam.add(ClothesResponse.builder()
                             .clothesId(clothes.getId())
-                            .clothesUrl(clothes.getPhotoUrl())
+                            .clothesUrl(photoUrl)
+                            .subCategory(clothes.getSubcategory())
                             .build());
         }
 
