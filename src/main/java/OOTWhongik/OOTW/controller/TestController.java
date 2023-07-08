@@ -2,6 +2,7 @@ package OOTWhongik.OOTW.controller;
 
 import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.domain.Member;
+import OOTWhongik.OOTW.httpconnection.HttpConn;
 import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +45,11 @@ public class TestController {
     public ResponseEntity<?> clothesRemoveTest(@RequestParam Long clothesId) {
         clothesRepository.deleteById(clothesId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/weather")
+    public String weatherTest(@RequestParam String tm, @RequestParam String stn_ko) {
+        return HttpConn.httpConnGet(tm, stn_ko);
     }
     
 }
