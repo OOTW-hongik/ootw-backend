@@ -31,7 +31,7 @@ public class OutfitService {
         Outfit outfit = Outfit.builder()
                 .owner(owner)
                 .outfitDate(outfitRequest.getOutfitDate())
-                .outfit_location(outfitRequest.getOutfitLocation())
+                .outfitLocation(outfitRequest.getOutfitLocation())
                 .highWc(outfitRequest.getHighWc())
                 .lowWc(outfitRequest.getLowWc())
                 .highTemp(outfitRequest.getHighTemp())
@@ -43,8 +43,16 @@ public class OutfitService {
                 .outfitComment(outfitRequest.getOutfitComment())
                 .skyCondition(outfitRequest.getSkyCondition())
                 .clothesOutfitList(new ArrayList<>())
+                .mainOuter(clothesRepository.findById(outfitRequest.getOuterIdList().get(0)).get())
+                .mainTop(clothesRepository.findById(outfitRequest.getTopIdList().get(0)).get())
+                .mainBottom(clothesRepository.findById(outfitRequest.getBottomIdList().get(0)).get())
                 .build();
-        for (Long clothesId : outfitRequest.getClothesList()) {
+        List<Long> clothesList = new ArrayList<>();
+        clothesList.addAll(outfitRequest.getOuterIdList());
+        clothesList.addAll(outfitRequest.getTopIdList());
+        clothesList.addAll(outfitRequest.getBottomIdList());
+        clothesList.addAll(outfitRequest.getEtcIdList());
+        for (Long clothesId : clothesList) {
             Clothes clothes = clothesRepository.findById(clothesId).get();
             ClothesOutfit clothesOutfit = ClothesOutfit.builder()
                     .clothes(clothes)
@@ -61,14 +69,31 @@ public class OutfitService {
         List<Outfit> outfitList = memberRepository.findById(memberId).get().getOutfitList();
         List<OutfitResponse> outfitListDtoResponse = new ArrayList<>();
         for (Outfit outfit : outfitList) {
+            int cntOuter = 0;
+            int cntTop = 0;
+            int cntBottom = 0;
+            for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
+                Clothes clothes = clothesOutfit.getClothes();
+                switch (clothes.getCategory()) {
+                    case "아우터":
+                        cntOuter++;
+                        break;
+                    case "상의":
+                        cntTop++;
+                        break;
+                    case "하의":
+                        cntBottom++;
+                        break;
+                }
+            }
             OutfitResponse outfitResponseParam = OutfitResponse.builder()
                     .outfit(outfit)
-                    .outerUrl("outerUrl")
-                    .topUrl("topUrl")
-                    .bottomUrl("bottomUrl")
-                    .isManyOuter(false)
-                    .isManyTop(false)
-                    .isManyBottom(false)
+                    .outerUrl(outfit.getMainOuter().getPhoto().getStoredFilePath())
+                    .topUrl(outfit.getMainTop().getPhoto().getStoredFilePath())
+                    .bottomUrl(outfit.getMainBottom().getPhoto().getStoredFilePath())
+                    .isManyOuter(cntOuter > 1)
+                    .isManyTop(cntTop > 1)
+                    .isManyBottom(cntBottom > 1)
                     .build();
             outfitListDtoResponse.add(outfitResponseParam);
         }

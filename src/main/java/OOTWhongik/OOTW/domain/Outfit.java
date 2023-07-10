@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class Outfit extends BaseTimeEntity {
 
 //    private LocalDateTime outfitDate;
     private String outfitDate;
-    private String outfit_location; // TODO: change String to enum
+    private String outfitLocation; // TODO: change String to enum
 
     private int highWc;
     private int lowWc;
@@ -42,6 +41,18 @@ public class Outfit extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "outfit", cascade = CascadeType.ALL)
     private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "main_outer_id")
+    private Clothes mainOuter;
+
+    @OneToOne
+    @JoinColumn(name = "main_top_id")
+    private Clothes mainTop;
+
+    @OneToOne
+    @JoinColumn(name = "main_bottom_id")
+    private Clothes mainBottom;
 
     public void addClothesOutfit (ClothesOutfit clothesOutfit) {
         clothesOutfitList.add(clothesOutfit);

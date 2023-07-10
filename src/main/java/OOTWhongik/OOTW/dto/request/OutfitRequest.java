@@ -19,7 +19,10 @@ public class OutfitRequest {
     private int bottomRating;
     private int etcRating;
     private String outfitComment;
-    private List<Long> clothesList;
+    private List<Long> outerIdList;
+    private List<Long> topIdList;
+    private List<Long> bottomIdList;
+    private List<Long> etcIdList;
 
 
 }
