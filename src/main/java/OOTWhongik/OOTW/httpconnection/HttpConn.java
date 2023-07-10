@@ -1,5 +1,12 @@
 package OOTWhongik.OOTW.httpconnection;
 
+import OOTWhongik.OOTW.service.WeatherService;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.springframework.stereotype.Component;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,16 +15,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
+@Component
 public class HttpConn {
-    public static String apiHubUrl = "https://apihub.kma.go.kr/api/typ01/url/kma_sfcdd.php";
-    private static String apiHubKey = "ouyiGH4ASpysohh-AAqceA"; //노출 시 변경
+    public String apiHubUrl = "https://apihub.kma.go.kr/api/typ01/url/kma_sfcdd.php";
+    private final String apiHubKey = "ouyiGH4ASpysohh-AAqceA"; //노출 시 변경
 
-    public static String httpConnGet(String tm, String stn_ko) {
+    public String httpConnGet(String tm, String stn) {
         String sb="";
-        int stn = stnMap.get(stn_ko);
 
         try{
             HttpURLConnection conn=(HttpURLConnection)new URL(apiHubUrl+"?tm="+tm+"&stn="+stn+"&authKey="+apiHubKey).openConnection();
@@ -48,7 +53,7 @@ public class HttpConn {
         return sb;
     }
 
-    public static String httpConnPost(String endpoint, String message) {
+    public String httpConnPost(String endpoint, String message) {
         String sb="";
 
         try{
@@ -94,63 +99,39 @@ public class HttpConn {
         return "errorPage/500";
     }
 
-    private static final Map<String, Integer> stnMap = new HashMap<>() {{
-        put("강릉",105);
-        put("강진군",259);
-        put("강화",201);
-        put("거제",294);
-        put("거창",284);
-        put("경주시", 283);
-        put("고산", 185);
-        put("고창", 172);
-        put("고창군", 251);
-        put("고흥", 262);
-        put("광양시", 266);
-        put("광주", 156);
-        put("구미", 279);
-        put("군산", 140);
-        put("금산", 238);
-        put("김해시", 253);
-        put("남원", 247);
-        put("남해", 295);
-        put("대관령", 100);
-        put("대구", 143);
-        put("대전", 133);
-        put("동두천", 98);
-        put("동해", 106);
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
-//        put("", );
+    public int[] getWeatherI (String rid) {
+        final String url = "http://www.weatheri.co.kr/forecast/forecast01.php?rid=" + rid;
+        System.out.println(url);
+        Connection conn = Jsoup.connect(url);
+        int highTemp = 0;
+        int lowTemp = 0;
+        int highWc = 0;
+        int lowWc = 0;
+        try {
+            Document document = conn.get();
+//            Element element = document.select("td").select("[onclick]").not("[align]").select("[style=\"cursor:pointer\"]").first();
+            Element element = document.select("td").select(".f11").first();
+            String[] tempList = element.text().split("˚C");
+            highTemp = Integer.parseInt(tempList[0].trim());
+            lowTemp = Integer.parseInt(tempList[1].trim());
+            element = document.select("td").select("[color=\"7f7f7f\"]").first();
+            String[] velocityList = element.text().split(" ");
+            int velocity = Integer.parseInt(velocityList[0].trim());
+            highWc = (int)Math.round(WeatherService.calcWc((double) highTemp, (double) velocity));
+            lowWc = (int)Math.round(WeatherService.calcWc((double) lowTemp, (double) velocity));
 
-    }};
+//            Elements elements = document.select("td").select("[color=\"7f7f7f\"]");
+//            int cnt = 2;
+//            for (Element e : elements) {
+//                if (cnt == 0) break;
+//                System.out.println(e.text());
+//                System.out.println();
+//                cnt--;
+//            }
 
+        } catch (IOException ignored) {
+        }
+        return new int[] {highTemp, lowTemp, highWc, lowWc};
+    }
 
 }

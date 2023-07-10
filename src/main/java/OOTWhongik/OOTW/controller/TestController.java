@@ -2,6 +2,7 @@ package OOTWhongik.OOTW.controller;
 
 import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.domain.Member;
+import OOTWhongik.OOTW.httpconnection.HttpConn;
 import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
 import OOTWhongik.OOTW.service.WeatherService;
@@ -20,7 +21,6 @@ import java.util.List;
 public class TestController {
     private final MemberRepository memberRepository;
     private final ClothesRepository clothesRepository;
-    private final  WeatherService weatherService;
 
     @Operation(summary = "member test", description = "member test")
     @GetMapping("/member")
@@ -46,12 +46,6 @@ public class TestController {
     public ResponseEntity<?> clothesRemoveTest(@RequestParam Long clothesId) {
         clothesRepository.deleteById(clothesId);
         return ResponseEntity.ok().build();
-    }
-
-    @Operation(summary = "weather api test", description = "풍속, 최고 온도, 최저 온도 반환")
-    @GetMapping("/weather")
-    public String[] weatherTest(@RequestParam String tm, @RequestParam String stn_ko) {
-        return weatherService.getWeatherInfo(tm, stn_ko);
     }
     
 }
