@@ -40,6 +40,7 @@ public class Outfit extends BaseTimeEntity {
     private Member owner;
 
     @OneToMany(mappedBy = "outfit", cascade = CascadeType.ALL)
+    @OrderColumn(name = "position")
     private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
 
     @OneToOne
