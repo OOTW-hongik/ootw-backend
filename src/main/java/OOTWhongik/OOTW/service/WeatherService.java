@@ -1,6 +1,5 @@
 package OOTWhongik.OOTW.service;
 
-import OOTWhongik.OOTW.dto.request.OutfitRegisterRequest;
 import OOTWhongik.OOTW.dto.response.OutfitRegisterResponse;
 import OOTWhongik.OOTW.httpconnection.HttpConn;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +22,12 @@ public class WeatherService {
         return 13.12 + 0.6215 * temp - 11.37 * Math.pow(velocity, 0.16) + 0.3965 * Math.pow(velocity, 0.16) * temp;
     }
 
-    public OutfitRegisterResponse getWeatherInfo(OutfitRegisterRequest outfitRegisterRequest) {
+    public OutfitRegisterResponse getWeatherInfo(String outfitDate, String outfitLocation) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formatedNow = LocalDate.now().format(formatter);
-        if (formatedNow.equals(outfitRegisterRequest.getOutfitDate().substring(0, 10))) {
+        if (formatedNow.equals(outfitDate.substring(0, 10))) {
             //오늘 날씨이면
-            String rid = currentRidMap.get(outfitRegisterRequest.getOutfitLocation());
+            String rid = currentRidMap.get(outfitLocation);
             int[] weatherInfo = httpConn.getWeatherI(rid);
             return OutfitRegisterResponse.builder()
                     .skyCondition(0)
@@ -39,10 +38,10 @@ public class WeatherService {
                     .build();
         } else {
             // 과거 날씨이면
-            String stn = pastRidMap.get(outfitRegisterRequest.getOutfitLocation());
-            String tm = outfitRegisterRequest.getOutfitDate().substring(0, 4)
-                    + outfitRegisterRequest.getOutfitDate().substring(5, 7)
-                    + outfitRegisterRequest.getOutfitDate().substring(8, 10);
+            String stn = pastRidMap.get(outfitLocation);
+            String tm = outfitDate.substring(0, 4)
+                    + outfitDate.substring(5, 7)
+                    + outfitDate.substring(8, 10);
             String[] beforeInfo = httpConn.httpConnGet(tm, stn).trim().split(tm);
             String[] info = beforeInfo[1].split(",");
             for (String s : beforeInfo) {
@@ -63,7 +62,7 @@ public class WeatherService {
         }
     }
 
-    private final Map<String, String> pastRidMap = new HashMap<>() {{
+    public static final Map<String, String> pastRidMap = new HashMap<>() {{
         put("서울경기","108");
         put("강원영서","212");
         put("강원영동","105");
@@ -77,7 +76,7 @@ public class WeatherService {
         put("울릉독도","115");
     }};
 
-    private final Map<String, String> currentRidMap = new HashMap<>() {{
+    public static final Map<String, String> currentRidMap = new HashMap<>() {{
         put("서울경기","0101010000");
         put("강원영서","0301040101");
         put("강원영동","0401020101");
