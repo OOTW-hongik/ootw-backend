@@ -4,7 +4,7 @@ import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.domain.ClothesOutfit;
 import OOTWhongik.OOTW.domain.Member;
 import OOTWhongik.OOTW.domain.Outfit;
-import OOTWhongik.OOTW.dto.response.OutfitResponse;
+import OOTWhongik.OOTW.dto.response.OutfitSummary;
 import OOTWhongik.OOTW.dto.response.OutfitListResponse;
 import OOTWhongik.OOTW.dto.request.OutfitRequest;
 import OOTWhongik.OOTW.repository.ClothesRepository;
@@ -63,11 +63,9 @@ public class OutfitService {
         outfitRepository.save(outfit);
     }
 
-    public OutfitListResponse getOutfitList(Long memberId) {
-        String name = memberRepository.findById(memberId).get().getName();
-        //List<Outfit> outfitList = outfitRepository.findAllByOwner(memberRepository.findById(memberId).get()).get();
-        List<Outfit> outfitList = memberRepository.findById(memberId).get().getOutfitList();
-        List<OutfitResponse> outfitListDtoResponse = new ArrayList<>();
+    public List<OutfitSummary> getOutfitSummaryList(Member member) {
+        List<Outfit> outfitList = member.getOutfitList();
+        List<OutfitSummary> outfitSummaryList = new ArrayList<>();
         for (Outfit outfit : outfitList) {
             int cntOuter = 0;
             int cntTop = 0;
@@ -86,7 +84,7 @@ public class OutfitService {
                         break;
                 }
             }
-            OutfitResponse outfitResponseParam = OutfitResponse.builder()
+            OutfitSummary outfitSummary = OutfitSummary.builder()
                     .outfit(outfit)
                     .outerUrl(outfit.getMainOuter().getPhoto().getStoredFilePath())
                     .topUrl(outfit.getMainTop().getPhoto().getStoredFilePath())
@@ -95,8 +93,15 @@ public class OutfitService {
                     .isManyTop(cntTop > 1)
                     .isManyBottom(cntBottom > 1)
                     .build();
-            outfitListDtoResponse.add(outfitResponseParam);
+            outfitSummaryList.add(outfitSummary);
         }
-        return new OutfitListResponse(name, outfitListDtoResponse);
+        return outfitSummaryList;
+    }
+
+    public OutfitListResponse getOutfitList(Long memberId) {
+        Member member = memberRepository.findById(memberId).get();
+        String name = member.getName();
+        List<OutfitSummary> outfitSummaryList = getOutfitSummaryList(member);
+        return new OutfitListResponse(name, outfitSummaryList);
     }
 }

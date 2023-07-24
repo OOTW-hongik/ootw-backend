@@ -10,12 +10,12 @@ import java.util.List;
 public class HomeResponse {
     private final String name;
     private final String location;
-    private final List<OutfitResponse> outfitResponseList;
+    private final List<OutfitSummary> outfitSummaryList;
 
     @Builder
-    public HomeResponse(Member member, List<OutfitResponse> outfitResponseList) {
+    public HomeResponse(Member member, List<OutfitSummary> outfitSummaryList) {
         this.name = member.getName();
         this.location = member.getLocation();
-        this.outfitResponseList = outfitResponseList;
+        this.outfitSummaryList = outfitSummaryList;
     }
 }
