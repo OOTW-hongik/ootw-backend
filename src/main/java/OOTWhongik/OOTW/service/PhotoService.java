@@ -36,4 +36,23 @@ public class PhotoService {
         }
         return photo;
     }
+
+    public Photo updatePhoto (MultipartFile file, Long clothesId, Long photoId) throws IOException {
+        Photo photo = null;
+        if (file.isEmpty()) {
+            // TODO : 파일이 없을 땐 어떻게 해야할까.. 고민을 해보아야 할 것 예외처리 해야함
+        }
+        else{
+            String dirName = "ootw";
+            List<String> uploadImageUrl = s3FileComponent.upload(file, dirName, Long.toString(clothesId));
+            photo = Photo.builder()
+                    .id(photoId)
+                    .originalFileName(file.getOriginalFilename())
+                    .storedFilePath(uploadImageUrl.get(0))
+                    .fileSize(file.getSize())
+                    .build();
+            photoRepository.save(photo);
+        }
+        return photo;
+    }
 }

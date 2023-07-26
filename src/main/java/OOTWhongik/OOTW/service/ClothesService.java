@@ -3,6 +3,7 @@ package OOTWhongik.OOTW.service;
 import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.domain.Photo;
 import OOTWhongik.OOTW.dto.request.ClothesRequest;
+import OOTWhongik.OOTW.dto.request.ClothesUpdateRequest;
 import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,4 +31,12 @@ public class ClothesService {
         clothesRepository.save(clothes);
     }
 
+    @Transactional
+    public void updateClothes(ClothesUpdateRequest clothesUpdateRequest, MultipartFile file) throws IOException {
+        Clothes newClothes = clothesUpdateRequest.toEntity();
+        Clothes oldClothes = clothesRepository.findById(clothesUpdateRequest.getClothesId()).get();
+        Photo photo = photoService.updatePhoto(file, newClothes.getId(), oldClothes.getPhoto().getId());
+        newClothes.setPhoto(photo);
+        clothesRepository.save(newClothes);
+    }
 }

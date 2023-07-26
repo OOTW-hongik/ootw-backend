@@ -6,7 +6,6 @@ import OOTWhongik.OOTW.dto.response.ClosetResponse;
 import OOTWhongik.OOTW.dto.response.ClothesResponse;
 import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +22,14 @@ public class ClosetService {
     private final MemberRepository memberRepository;
 
     public ClosetResponse getCloset(Long memberId, String category) {
+        return getCloset(memberId, category, false);
+    }
+
+    public ClosetResponse getHiddenCloset(Long memberId, String category) {
+        return getCloset(memberId, category, true);
+    }
+
+    public ClosetResponse getCloset(Long memberId, String category, boolean hidden) {
         Member member = memberRepository.findById(memberId).get();
         List<Clothes> clothesList;
         if (clothesRepository.findAllByMemberAndCategory(member, category).isPresent()) {
@@ -33,6 +40,7 @@ public class ClosetService {
         List<String> subCategoryCollection = new ArrayList<>();
         List<ClothesResponse> clothesResponseParam = new ArrayList<>();
         for (Clothes clothes : clothesList) {
+            if (clothes.isHidden() != hidden) continue;
             //subcategory 가 있는지 검사하고 없으면 삽입
             if (!subCategoryCollection.contains(clothes.getSubcategory())) {
                 subCategoryCollection.add(clothes.getSubcategory());
