@@ -3,6 +3,7 @@ package OOTWhongik.OOTW.controller;
 import OOTWhongik.OOTW.dto.request.ClothesUpdateRequest;
 import OOTWhongik.OOTW.dto.response.ClosetResponse;
 import OOTWhongik.OOTW.dto.request.ClothesRequest;
+import OOTWhongik.OOTW.dto.response.ClothesDetailResponse;
 import OOTWhongik.OOTW.service.ClosetService;
 import OOTWhongik.OOTW.service.ClothesService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,6 +49,12 @@ public class ClosetController {
                                            @RequestPart MultipartFile clothesPhoto) throws IOException {
         clothesService.updateClothes(clothesUpdateRequest, clothesPhoto);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "clothes detail", description = "옷 상세 페이지")
+    @GetMapping("/clothes")
+    public ClothesDetailResponse getClothes(@RequestParam Long clothesId) {
+        return closetService.getClothes(clothesId);
     }
 
 }

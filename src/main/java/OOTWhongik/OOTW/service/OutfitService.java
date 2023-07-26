@@ -4,6 +4,7 @@ import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.domain.ClothesOutfit;
 import OOTWhongik.OOTW.domain.Member;
 import OOTWhongik.OOTW.domain.Outfit;
+import OOTWhongik.OOTW.dto.response.OutfitDetailResponse;
 import OOTWhongik.OOTW.dto.response.OutfitSummary;
 import OOTWhongik.OOTW.dto.response.OutfitListResponse;
 import OOTWhongik.OOTW.dto.request.OutfitRequest;
@@ -103,5 +104,12 @@ public class OutfitService {
         String name = member.getName();
         List<OutfitSummary> outfitSummaryList = getOutfitSummaryList(member);
         return new OutfitListResponse(name, outfitSummaryList);
+    }
+
+    public OutfitDetailResponse getOutfitDetail(Long outfitId) {
+        Outfit outfit = outfitRepository.findById(outfitId).get();
+        return OutfitDetailResponse.builder()
+                .outfit(outfit)
+                .build();
     }
 }

@@ -3,6 +3,7 @@ package OOTWhongik.OOTW.service;
 import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.domain.Member;
 import OOTWhongik.OOTW.dto.response.ClosetResponse;
+import OOTWhongik.OOTW.dto.response.ClothesDetailResponse;
 import OOTWhongik.OOTW.dto.response.ClothesResponse;
 import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
@@ -57,5 +58,16 @@ public class ClosetService {
         }
 
         return new ClosetResponse(subCategoryCollection, clothesResponseParam);
+    }
+
+    public ClothesDetailResponse getClothes(Long clothesId) {
+        Clothes clothes = clothesRepository.findById(clothesId).get();
+        return ClothesDetailResponse.builder()
+                .clothesId(clothesId)
+                .clothesUrl(clothes.getPhoto().getStoredFilePath())
+                .subCategory(clothes.getCategory())
+                .clothesComment(clothes.getClothesComment())
+                .hidden(clothes.isHidden())
+                .build();
     }
 }

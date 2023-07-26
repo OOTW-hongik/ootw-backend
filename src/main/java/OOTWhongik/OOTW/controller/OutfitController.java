@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.controller;
 
+import OOTWhongik.OOTW.dto.response.OutfitDetailResponse;
 import OOTWhongik.OOTW.dto.response.OutfitRegisterResponse;
 import OOTWhongik.OOTW.dto.response.OutfitListResponse;
 import OOTWhongik.OOTW.dto.request.OutfitRequest;
@@ -37,4 +38,11 @@ public class OutfitController {
     public OutfitRegisterResponse outfitRegister(@RequestParam String outfitDate, @RequestParam String outfitLocation) {
         return weatherService.getWeatherInfo(outfitDate, outfitLocation);
     }
+
+    @Operation(summary = "outfit detail", description = "착장 상세 페이지")
+    @GetMapping("/")
+    public OutfitDetailResponse outfitDetail(@RequestParam Long outfitId) {
+        return outfitService.getOutfitDetail(outfitId);
+    }
+
 }
