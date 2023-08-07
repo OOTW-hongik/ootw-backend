@@ -65,7 +65,7 @@ public class ClosetService {
         return ClothesDetailResponse.builder()
                 .clothesId(clothesId)
                 .clothesUrl(clothes.getPhoto().getStoredFilePath())
-                .subCategory(clothes.getCategory())
+                .subCategory(clothes.getSubcategory())
                 .clothesComment(clothes.getClothesComment())
                 .hidden(clothes.isHidden())
                 .build();
