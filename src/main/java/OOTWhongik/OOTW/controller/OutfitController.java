@@ -1,8 +1,8 @@
 package OOTWhongik.OOTW.controller;
 
+import OOTWhongik.OOTW.dto.WeatherSummary;
 import OOTWhongik.OOTW.dto.request.OutfitUpdateRequest;
 import OOTWhongik.OOTW.dto.response.OutfitDetailResponse;
-import OOTWhongik.OOTW.dto.response.OutfitRegisterResponse;
 import OOTWhongik.OOTW.dto.response.OutfitListResponse;
 import OOTWhongik.OOTW.dto.request.OutfitRequest;
 import OOTWhongik.OOTW.service.OutfitService;
@@ -45,7 +45,7 @@ public class OutfitController {
 
     @Operation(summary = "outfit register page", description = "착장 생성 시 날씨 조회")
     @GetMapping("/register")
-    public OutfitRegisterResponse outfitRegister(@RequestParam String outfitDate, @RequestParam String outfitLocation) throws IOException {
+    public WeatherSummary outfitRegister(@RequestParam String outfitDate, @RequestParam String outfitLocation) throws IOException {
         return weatherService.getWeatherInfo(outfitDate, outfitLocation);
     }
 

@@ -1,6 +1,6 @@
 package OOTWhongik.OOTW.service;
 
-import OOTWhongik.OOTW.dto.response.OutfitRegisterResponse;
+import OOTWhongik.OOTW.dto.WeatherSummary;
 import OOTWhongik.OOTW.httpconnection.HttpConn;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Document;
@@ -25,7 +25,8 @@ public class WeatherService {
     public static double calcWc (double temp, double velocity) {
         return 13.12 + 0.6215 * temp - 11.37 * Math.pow(velocity, 0.16) + 0.3965 * Math.pow(velocity, 0.16) * temp;
     }
-    public OutfitRegisterResponse getWeatherInfo(String outfitDate, String outfitLocation) throws IOException {
+    public WeatherSummary getWeatherInfo(String outfitDate, String outfitLocation) throws IOException {
+//        if (Integer.parseInt(outfitDate.substring(0, 4)) < 1973) throw new Exception();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formatedNow = LocalDate.now().format(formatter);
         if (formatedNow.equals(outfitDate.substring(0, 10))) {
@@ -46,7 +47,7 @@ public class WeatherService {
             int velocity = Integer.parseInt(velocityList[0].trim());
             highWc = (int)Math.round(WeatherService.calcWc(highTemp, velocity));
             lowWc = (int)Math.round(WeatherService.calcWc(lowTemp, velocity));
-            return OutfitRegisterResponse.builder()
+            return WeatherSummary.builder()
                     .skyCondition(0)
                     .highTemp(highTemp)
                     .lowTemp(lowTemp)
@@ -72,7 +73,7 @@ public class WeatherService {
             double velocity = Double.parseDouble(elements.get(15).text());
             highWc = (int)Math.round(WeatherService.calcWc(highTemp, velocity));
             lowWc = (int)Math.round(WeatherService.calcWc(lowTemp, velocity));
-            return OutfitRegisterResponse.builder()
+            return WeatherSummary.builder()
                     .skyCondition(0)
                     .highTemp((int)Math.round(highTemp))
                     .lowTemp((int)Math.round(lowTemp))
