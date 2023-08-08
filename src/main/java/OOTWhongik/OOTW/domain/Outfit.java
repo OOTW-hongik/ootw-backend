@@ -1,9 +1,6 @@
 package OOTWhongik.OOTW.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,6 +8,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -57,5 +55,8 @@ public class Outfit extends BaseTimeEntity {
 
     public void addClothesOutfit (ClothesOutfit clothesOutfit) {
         clothesOutfitList.add(clothesOutfit);
+    }
+    public void deleteClothesOutfit (ClothesOutfit clothesOutfit) {
+        clothesOutfitList.remove(clothesOutfit);
     }
 }

@@ -4,10 +4,12 @@ import OOTWhongik.OOTW.domain.Clothes;
 import OOTWhongik.OOTW.domain.ClothesOutfit;
 import OOTWhongik.OOTW.domain.Member;
 import OOTWhongik.OOTW.domain.Outfit;
+import OOTWhongik.OOTW.dto.request.OutfitUpdateRequest;
 import OOTWhongik.OOTW.dto.response.OutfitDetailResponse;
 import OOTWhongik.OOTW.dto.response.OutfitSummary;
 import OOTWhongik.OOTW.dto.response.OutfitListResponse;
 import OOTWhongik.OOTW.dto.request.OutfitRequest;
+import OOTWhongik.OOTW.repository.ClothesOutfitRepository;
 import OOTWhongik.OOTW.repository.ClothesRepository;
 import OOTWhongik.OOTW.repository.MemberRepository;
 import OOTWhongik.OOTW.repository.OutfitRepository;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,6 +28,7 @@ public class OutfitService {
     private final OutfitRepository outfitRepository;
     private final MemberRepository memberRepository;
     private final ClothesRepository clothesRepository;
+    private final ClothesOutfitRepository clothesOutfitRepository;
 
     @Transactional
     public void saveOutfit(OutfitRequest outfitRequest) {
@@ -62,6 +66,49 @@ public class OutfitService {
             outfit.addClothesOutfit(clothesOutfit);
         }
         outfitRepository.save(outfit);
+    }
+
+    @Transactional
+    public void updateOutfit(OutfitUpdateRequest outfitUpdateRequest) {
+        Outfit outfit = outfitRepository.findById(outfitUpdateRequest.getOutfitId()).get();
+        outfit.setOutfitDate(outfitUpdateRequest.getOutfitDate());
+        outfit.setOutfitLocation(outfitUpdateRequest.getOutfitLocation());
+        outfit.setHighWc(outfitUpdateRequest.getHighWc());
+        outfit.setLowWc(outfitUpdateRequest.getLowWc());
+        outfit.setHighTemp(outfitUpdateRequest.getHighTemp());
+        outfit.setLowTemp(outfitUpdateRequest.getLowTemp());
+        outfit.setOuterRating(outfitUpdateRequest.getOuterRating());
+        outfit.setTopRating(outfitUpdateRequest.getTopRating());
+        outfit.setBottomRating(outfitUpdateRequest.getBottomRating());
+        outfit.setOutfitComment(outfitUpdateRequest.getOutfitComment());
+        outfit.setSkyCondition(outfitUpdateRequest.getSkyCondition());
+        outfit.setMainOuter(clothesRepository.findById(outfitUpdateRequest.getOuterIdList().get(0)).get());
+        outfit.setMainOuter(clothesRepository.findById(outfitUpdateRequest.getTopIdList().get(0)).get());
+        outfit.setMainBottom(clothesRepository.findById(outfitUpdateRequest.getBottomIdList().get(0)).get());
+        List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
+        List<Long> clothesList = new ArrayList<>();
+        clothesList.addAll(outfitUpdateRequest.getOuterIdList());
+        clothesList.addAll(outfitUpdateRequest.getTopIdList());
+        clothesList.addAll(outfitUpdateRequest.getBottomIdList());
+        clothesList.addAll(outfitUpdateRequest.getEtcIdList());
+        for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
+            if (!clothesList.contains(clothesOutfit.getClothes().getId())) {
+                clothesOutfitRepository.delete(clothesOutfit);
+            }
+        }
+        for (Long clothesId : clothesList) {
+            Clothes clothes = clothesRepository.findById(clothesId).get();
+            Optional<ClothesOutfit> clothesOutfit = clothesOutfitRepository.findByClothesAndOutfit(clothes, outfit);
+            if (clothesOutfit.isPresent()) {
+                clothesOutfitList.add(clothesOutfit.get());
+            } else {
+                clothesOutfitList.add(ClothesOutfit.builder()
+                        .clothes(clothes)
+                        .outfit(outfit)
+                        .build());
+            }
+        }
+        outfit.setClothesOutfitList(clothesOutfitList);
     }
 
     public List<OutfitSummary> getOutfitSummaryList(Member member) {

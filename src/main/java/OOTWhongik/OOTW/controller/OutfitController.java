@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.controller;
 
+import OOTWhongik.OOTW.dto.request.OutfitUpdateRequest;
 import OOTWhongik.OOTW.dto.response.OutfitDetailResponse;
 import OOTWhongik.OOTW.dto.response.OutfitRegisterResponse;
 import OOTWhongik.OOTW.dto.response.OutfitListResponse;
@@ -24,6 +25,13 @@ public class OutfitController {
     @PostMapping("/")
     public ResponseEntity<?> saveOutfit(@RequestBody OutfitRequest outfitRequest) {
         outfitService.saveOutfit(outfitRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "outfit update", description = "착장 수정")
+    @PutMapping("/")
+    public ResponseEntity<?> updateOutfit(@RequestBody OutfitUpdateRequest outfitUpdateRequest) {
+        outfitService.updateOutfit(outfitUpdateRequest);
         return ResponseEntity.ok().build();
     }
 

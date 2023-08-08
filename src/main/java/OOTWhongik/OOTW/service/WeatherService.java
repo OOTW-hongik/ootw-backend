@@ -43,6 +43,7 @@ public class WeatherService {
                     + outfitDate.substring(5, 7)
                     + outfitDate.substring(8, 10);
             String[] beforeInfo = httpConn.httpConnGet(tm, stn).trim().split(tm);
+
             String[] info = beforeInfo[1].split(",");
             for (String s : beforeInfo) {
                 System.out.println(s);
@@ -52,6 +53,7 @@ public class WeatherService {
             int velocity = (int) Math.round(Double.parseDouble(info[2]));
             int highWc = (int) calcWc(highTemp, velocity);
             int lowWc = (int) calcWc(lowTemp, velocity);
+            System.out.println("과거 날씨 : highTemp, lowTemp, velocity, highWc, lowWc = " + highTemp + " " + lowTemp + " " + velocity + " " + highWc + " " + lowWc);
             return OutfitRegisterResponse.builder()
                     .skyCondition(0)
                     .highTemp(highTemp)
