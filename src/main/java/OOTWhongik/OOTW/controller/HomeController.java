@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @Tag(name = "home", description = "home")
 @RequiredArgsConstructor
 @RestController
@@ -17,7 +19,7 @@ public class HomeController {
 
     @Operation(summary = "home", description = "home")
     @GetMapping("/home")
-    public HomeResponse home(@RequestParam Long memberId) {
+    public HomeResponse home(@RequestParam Long memberId) throws IOException {
         return homeService.getHome(memberId);
     }
 }

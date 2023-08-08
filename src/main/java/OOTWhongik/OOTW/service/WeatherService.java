@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.service;
 
+import OOTWhongik.OOTW.dto.WeatherGraphInfo;
 import OOTWhongik.OOTW.dto.WeatherSummary;
 import OOTWhongik.OOTW.httpconnection.HttpConn;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -25,62 +25,90 @@ public class WeatherService {
     public static double calcWc (double temp, double velocity) {
         return 13.12 + 0.6215 * temp - 11.37 * Math.pow(velocity, 0.16) + 0.3965 * Math.pow(velocity, 0.16) * temp;
     }
+    
     public WeatherSummary getWeatherInfo(String outfitDate, String outfitLocation) throws IOException {
 //        if (Integer.parseInt(outfitDate.substring(0, 4)) < 1973) throw new Exception();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formatedNow = LocalDate.now().format(formatter);
         if (formatedNow.equals(outfitDate.substring(0, 10))) {
             //오늘 날씨이면
-            String rid = ridMap.get(outfitLocation);
-            int highTemp;
-            int lowTemp;
-            int highWc;
-            int lowWc;
-            Document httpResponse = httpConn.getCrawling(
-                    "https://www.weatheri.co.kr/forecast/forecast01.php?rid=" + rid);
-            Element element = httpResponse.select("td").select(".f11").first();
-            String[] tempList = element.text().split("˚C");
-            highTemp = (int)Math.round(Double.parseDouble(tempList[0].trim()));
-            lowTemp = (int)Math.round(Double.parseDouble(tempList[1].trim()));
-            element = httpResponse.select("td").select("[color=\"7f7f7f\"]").first();
-            String[] velocityList = element.text().split(" ");
-            int velocity = Integer.parseInt(velocityList[0].trim());
-            highWc = (int)Math.round(WeatherService.calcWc(highTemp, velocity));
-            lowWc = (int)Math.round(WeatherService.calcWc(lowTemp, velocity));
-            return WeatherSummary.builder()
-                    .skyCondition(0)
-                    .highTemp(highTemp)
-                    .lowTemp(lowTemp)
-                    .highWc(highWc)
-                    .lowWc(lowWc)
-                    .build();
+            return getTodayWeather(outfitLocation);
         } else {
             //과거 날씨이면
-            String jijum_id = jijumIdMap.get(outfitLocation);
-            String date = outfitDate.substring(0, 10);
-            double highTemp;
-            double lowTemp;
-            int highWc;
-            int lowWc;
-            Document httpResponse = httpConn.getCrawling(
-                    "https://www.weatheri.co.kr/bygone/pastDB_tmp.php?"
-                            + "jijum_id=" + jijum_id
-                            + "&start=" + date);
-            Element element = httpResponse.select("tr").select("[bgcolor=#ffffff]").first();
-            Elements elements = element.getAllElements();
-            highTemp = Double.parseDouble(elements.get(7).text());
-            lowTemp = Double.parseDouble(elements.get(9).text());
-            double velocity = Double.parseDouble(elements.get(15).text());
-            highWc = (int)Math.round(WeatherService.calcWc(highTemp, velocity));
-            lowWc = (int)Math.round(WeatherService.calcWc(lowTemp, velocity));
-            return WeatherSummary.builder()
-                    .skyCondition(0)
-                    .highTemp((int)Math.round(highTemp))
-                    .lowTemp((int)Math.round(lowTemp))
-                    .highWc(highWc)
-                    .lowWc(lowWc)
-                    .build();
+            return getPastWeather(outfitDate, outfitLocation);
         }
+    }
+
+    public WeatherSummary getPastWeather(String outfitDate, String outfitLocation) throws IOException {
+        String jijum_id = jijumIdMap.get(outfitLocation);
+        String date = outfitDate.substring(0, 10);
+        double highTemp;
+        double lowTemp;
+        int highWc;
+        int lowWc;
+        Document httpResponse = httpConn.getCrawling(
+                "https://www.weatheri.co.kr/bygone/pastDB_tmp.php?"
+                        + "jijum_id=" + jijum_id
+                        + "&start=" + date);
+        Element element = httpResponse.select("tr").select("[bgcolor=#ffffff]").first();
+        Elements elements = element.getAllElements();
+        highTemp = Double.parseDouble(elements.get(7).text());
+        lowTemp = Double.parseDouble(elements.get(9).text());
+        double velocity = Double.parseDouble(elements.get(15).text());
+        highWc = (int)Math.round(WeatherService.calcWc(highTemp, velocity));
+        lowWc = (int)Math.round(WeatherService.calcWc(lowTemp, velocity));
+        return WeatherSummary.builder()
+                .skyCondition(0)
+                .highTemp((int) Math.round(highTemp))
+                .lowTemp((int) Math.round(lowTemp))
+                .highWc(highWc)
+                .lowWc(lowWc)
+                .build();
+    }
+
+    public WeatherSummary getTodayWeather(String outfitLocation) throws IOException {
+        String rid = ridMap.get(outfitLocation);
+        int highTemp;
+        int lowTemp;
+        int highWc;
+        int lowWc;
+        Document httpResponse = httpConn.getCrawling(
+                "https://www.weatheri.co.kr/forecast/forecast01.php?rid=" + rid);
+        Element element = httpResponse.select("td").select(".f11").first();
+        String[] tempList = element.text().split("˚C");
+        highTemp = (int)Math.round(Double.parseDouble(tempList[0].trim()));
+        lowTemp = (int)Math.round(Double.parseDouble(tempList[1].trim()));
+        element = httpResponse.select("td").select("[color=\"7f7f7f\"]").first();
+        String[] velocityList = element.text().split(" ");
+        int velocity = Integer.parseInt(velocityList[0].trim());
+        highWc = (int)Math.round(WeatherService.calcWc(highTemp, velocity));
+        lowWc = (int)Math.round(WeatherService.calcWc(lowTemp, velocity));
+        return WeatherSummary.builder()
+                .skyCondition(0)
+                .highTemp(highTemp)
+                .lowTemp(lowTemp)
+                .highWc(highWc)
+                .lowWc(lowWc)
+                .build();
+    }
+
+    public List<WeatherGraphInfo> getWeatherGraphInfo(String location) throws IOException {
+        String rid = ridMap.get(location);
+        Document httpResponse = httpConn.getCrawling(
+                "https://www.weatheri.co.kr/forecast/forecast01.php?rid=" + rid);
+        Element element1 = httpResponse.select("table").select("[bgcolor=#BCBFC2]").get(2);
+        Element element2 = element1.select("tr").select("[bgcolor=#ffffff]").get(8);
+        String[] temp = element2.text().trim().split(" ");
+
+        List<WeatherGraphInfo> weatherGraphInfoList = new ArrayList<>();
+        for (int i = 2; i <= 8; i++) {
+            weatherGraphInfoList.add(WeatherGraphInfo.builder()
+                            .time(i * 3)
+                            .temp(Integer.parseInt(temp[i]))
+                            .skyCondition(0)
+                            .build());
+        }
+        return weatherGraphInfoList;
     }
 
     public static final Map<String, String> jijumIdMap = new HashMap<>() {{
@@ -110,7 +138,4 @@ public class WeatherService {
         put("제주도","1301030101");
         put("울릉독도","0501010101");
     }};
-
-
-
 }
