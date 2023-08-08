@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @Tag(name = "outfit", description = "outfit")
 @RequiredArgsConstructor
 @RestController
@@ -43,7 +45,7 @@ public class OutfitController {
 
     @Operation(summary = "outfit register page", description = "착장 생성 시 날씨 조회")
     @GetMapping("/register")
-    public OutfitRegisterResponse outfitRegister(@RequestParam String outfitDate, @RequestParam String outfitLocation) {
+    public OutfitRegisterResponse outfitRegister(@RequestParam String outfitDate, @RequestParam String outfitLocation) throws IOException {
         return weatherService.getWeatherInfo(outfitDate, outfitLocation);
     }
 
