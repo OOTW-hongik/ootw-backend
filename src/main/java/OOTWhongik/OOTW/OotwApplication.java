@@ -21,7 +21,7 @@ public class OotwApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**").allowedOrigins("http://localhost:3000");
-				registry.addMapping("/**").allowedOrigins("http://http://ootw.s3-website.ap-northeast-2.amazonaws.com/");
+				registry.addMapping("/**").allowedOrigins("http://ootw.s3-website.ap-northeast-2.amazonaws.com/");
 			}
 		};
 	}
