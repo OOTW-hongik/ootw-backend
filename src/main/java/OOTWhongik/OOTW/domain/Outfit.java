@@ -41,18 +41,6 @@ public class Outfit extends BaseTimeEntity {
     @OrderColumn(name = "position")
     private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
 
-    @OneToOne
-    @JoinColumn(name = "main_outer_id")
-    private Clothes mainOuter;
-
-    @OneToOne
-    @JoinColumn(name = "main_top_id")
-    private Clothes mainTop;
-
-    @OneToOne
-    @JoinColumn(name = "main_bottom_id")
-    private Clothes mainBottom;
-
     public void addClothesOutfit (ClothesOutfit clothesOutfit) {
         clothesOutfitList.add(clothesOutfit);
     }

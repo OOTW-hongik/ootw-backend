@@ -48,9 +48,6 @@ public class OutfitService {
                 .outfitComment(outfitRequest.getOutfitComment())
                 .skyCondition(outfitRequest.getSkyCondition())
                 .clothesOutfitList(new ArrayList<>())
-                .mainOuter(clothesRepository.findById(outfitRequest.getOuterIdList().get(0)).get())
-                .mainTop(clothesRepository.findById(outfitRequest.getTopIdList().get(0)).get())
-                .mainBottom(clothesRepository.findById(outfitRequest.getBottomIdList().get(0)).get())
                 .build();
         List<Long> clothesList = new ArrayList<>();
         clothesList.addAll(outfitRequest.getOuterIdList());
@@ -82,9 +79,6 @@ public class OutfitService {
         outfit.setBottomRating(outfitUpdateRequest.getBottomRating());
         outfit.setOutfitComment(outfitUpdateRequest.getOutfitComment());
         outfit.setSkyCondition(outfitUpdateRequest.getSkyCondition());
-        outfit.setMainOuter(clothesRepository.findById(outfitUpdateRequest.getOuterIdList().get(0)).get());
-        outfit.setMainOuter(clothesRepository.findById(outfitUpdateRequest.getTopIdList().get(0)).get());
-        outfit.setMainBottom(clothesRepository.findById(outfitUpdateRequest.getBottomIdList().get(0)).get());
         List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
         List<Long> clothesList = new ArrayList<>();
         clothesList.addAll(outfitUpdateRequest.getOuterIdList());
@@ -118,25 +112,34 @@ public class OutfitService {
             int cntOuter = 0;
             int cntTop = 0;
             int cntBottom = 0;
+            Clothes mainOuter = null;
+            Clothes mainTop = null;
+            Clothes mainBottom = null;
             for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
                 Clothes clothes = clothesOutfit.getClothes();
                 switch (clothes.getCategory()) {
                     case "아우터":
                         cntOuter++;
+                        if (mainOuter == null)
+                            mainOuter = clothes;
                         break;
                     case "상의":
                         cntTop++;
+                        if (mainTop == null)
+                            mainTop = clothes;
                         break;
                     case "하의":
                         cntBottom++;
+                        if (mainBottom == null)
+                            mainBottom = clothes;
                         break;
                 }
             }
             OutfitSummary outfitSummary = OutfitSummary.builder()
                     .outfit(outfit)
-                    .outerUrl(outfit.getMainOuter().getPhoto().getStoredFilePath())
-                    .topUrl(outfit.getMainTop().getPhoto().getStoredFilePath())
-                    .bottomUrl(outfit.getMainBottom().getPhoto().getStoredFilePath())
+                    .outerUrl(mainOuter.getPhoto().getStoredFilePath())
+                    .topUrl(mainTop.getPhoto().getStoredFilePath())
+                    .bottomUrl(mainBottom.getPhoto().getStoredFilePath())
                     .isManyOuter(cntOuter > 1)
                     .isManyTop(cntTop > 1)
                     .isManyBottom(cntBottom > 1)
