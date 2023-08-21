@@ -86,9 +86,9 @@ public class OutfitService {
         clothesList.addAll(outfitUpdateRequest.getBottomIdList());
         clothesList.addAll(outfitUpdateRequest.getEtcIdList());
         for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
-            if (!clothesList.contains(clothesOutfit.getClothes().getId())) {
-                clothesOutfitRepository.delete(clothesOutfit);
-            }
+//            if (!clothesList.contains(clothesOutfit.getClothes().getId())) {
+                clothesOutfitRepository.deleteClothesOutfit(clothesOutfit.getId());
+//            }
         }
         for (Long clothesId : clothesList) {
             Clothes clothes = clothesRepository.findById(clothesId).get();
@@ -103,6 +103,7 @@ public class OutfitService {
             }
         }
         outfit.setClothesOutfitList(clothesOutfitList);
+        outfitRepository.save(outfit);
     }
 
     public List<OutfitSummary> getOutfitSummaryList(Member member) {
