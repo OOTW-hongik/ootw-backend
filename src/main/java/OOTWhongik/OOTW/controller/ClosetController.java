@@ -51,6 +51,13 @@ public class ClosetController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "clothes update", description = "사진제외 옷 수정")
+    @PatchMapping("/clothes")
+    public ResponseEntity<?> updateClothesWithoutPhoto(@RequestBody ClothesUpdateRequest clothesUpdateRequest) {
+        clothesService.updateClothes(clothesUpdateRequest);
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(summary = "clothes detail", description = "옷 상세 페이지")
     @GetMapping("/clothes")
     public ClothesDetailResponse getClothes(@RequestParam Long clothesId) {

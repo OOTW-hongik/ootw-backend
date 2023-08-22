@@ -33,10 +33,15 @@ public class ClothesService {
 
     @Transactional
     public void updateClothes(ClothesUpdateRequest clothesUpdateRequest, MultipartFile file) throws IOException {
-        Clothes newClothes = clothesUpdateRequest.toEntity(clothesRepository.findById(clothesUpdateRequest.getClothesId()).get().getMember());
-        Clothes oldClothes = clothesRepository.findById(clothesUpdateRequest.getClothesId()).get();
-        Photo photo = photoService.updatePhoto(file, newClothes.getId(), oldClothes.getPhoto().getId());
-        newClothes.setPhoto(photo);
-        clothesRepository.save(newClothes);
+        Clothes clothes = clothesRepository.findById(clothesUpdateRequest.getClothesId()).get();
+        clothes.update(clothesUpdateRequest);
+        Photo photo = photoService.updatePhoto(file, clothes.getId(), clothes.getPhoto().getId());
+        clothes.setPhoto(photo);
+    }
+
+    @Transactional
+    public void updateClothes(ClothesUpdateRequest clothesUpdateRequest) {
+        Clothes clothes = clothesRepository.findById(clothesUpdateRequest.getClothesId()).get();
+        clothes.update(clothesUpdateRequest);
     }
 }

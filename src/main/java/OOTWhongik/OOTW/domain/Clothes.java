@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.domain;
 
+import OOTWhongik.OOTW.dto.request.ClothesUpdateRequest;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,5 +43,12 @@ public class Clothes extends BaseTimeEntity{
 
     public void setPhoto(Photo photo) {
         this.photo = photo;
+    }
+
+    public void update(ClothesUpdateRequest clothesUpdateRequest) {
+        this.category = clothesUpdateRequest.getCategory();
+        this.subcategory = clothesUpdateRequest.getSubCategory();
+        this.clothesComment = clothesUpdateRequest.getClothesComment();
+        this.hidden = clothesUpdateRequest.isHidden();
     }
 }
