@@ -163,4 +163,13 @@ public class OutfitService {
                 .outfit(outfit)
                 .build();
     }
+
+    @Transactional
+    public void deleteOutfit(Long outfitId) {
+        Outfit outfit = outfitRepository.findById(outfitId).get();
+        for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
+            clothesOutfitRepository.deleteClothesOutfit(clothesOutfit.getId());
+        }
+        outfitRepository.deleteOutfit(outfit.getId());
+    }
 }

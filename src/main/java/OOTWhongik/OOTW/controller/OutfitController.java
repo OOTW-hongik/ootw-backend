@@ -55,4 +55,11 @@ public class OutfitController {
         return outfitService.getOutfitDetail(outfitId);
     }
 
+    @Operation(summary = "outfit delete", description = "착장 삭제")
+    @DeleteMapping("/")
+    public ResponseEntity<?> outfitDelete(@RequestParam Long outfitId) {
+        outfitService.deleteOutfit(outfitId);
+        return ResponseEntity.ok().build();
+    }
+
 }
