@@ -3,6 +3,7 @@ package OOTWhongik.OOTW.service;
 import OOTWhongik.OOTW.domain.Member;
 import OOTWhongik.OOTW.dto.WeatherGraphInfo;
 import OOTWhongik.OOTW.dto.WeatherSummary;
+import OOTWhongik.OOTW.dto.request.LocationUpdateRequest;
 import OOTWhongik.OOTW.dto.response.HomeResponse;
 import OOTWhongik.OOTW.dto.response.OutfitSummary;
 import OOTWhongik.OOTW.repository.MemberRepository;
@@ -37,5 +38,11 @@ public class HomeService {
                 .weatherGraphInfoList(weatherGraphInfoList)
                 .outfitSummaryList(outfitSummaryList)
                 .build();
+    }
+
+    @Transactional
+    public void updateLocation(LocationUpdateRequest locationUpdateRequest) {
+        Member member = memberRepository.findById(locationUpdateRequest.getMemberId()).get();
+        member.setLocation(locationUpdateRequest.getLocation());
     }
 }
