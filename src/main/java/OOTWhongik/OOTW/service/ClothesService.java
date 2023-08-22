@@ -44,4 +44,13 @@ public class ClothesService {
         Clothes clothes = clothesRepository.findById(clothesUpdateRequest.getClothesId()).get();
         clothes.update(clothesUpdateRequest);
     }
+
+    @Transactional
+    public void deleteClothes(Long clothesId) throws Exception {
+        Clothes clothes = clothesRepository.findById(clothesId).get();
+        if (clothes.getClothesOutfitList().size() > 0)
+            throw new Exception("옷이 쓰인 착장이 없어야 삭제가 가능합니다.");
+        photoService.deletePhoto(clothes.getPhoto());
+        clothesRepository.delete(clothes);
+    }
 }

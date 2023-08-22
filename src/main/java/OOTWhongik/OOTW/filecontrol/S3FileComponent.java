@@ -61,7 +61,7 @@ public class S3FileComponent {
             listUrl.add(uploadImageUrl);
 
         }
-        if (listUrl.size() == 0) log.info("dfjoaisjedfo");
+        if (listUrl.size() == 0) log.info("listUrl이 비어있습니다.");
         return listUrl;
     }
 
@@ -91,7 +91,8 @@ public class S3FileComponent {
         return Optional.empty();
     }
 
-    public ResponseEntity<?> delete(String filePath) { // 객체 삭제 filePath : 폴더명/파일네임.파일확장자
+    public ResponseEntity<?> delete(String dirName, String fileName) { // 객체 삭제 filePath : 폴더명/파일네임.파일확장자
+        String filePath = dirName + "/" + fileName;
         try {
             amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, filePath));
         } catch (AmazonServiceException e) {

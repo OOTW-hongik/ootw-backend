@@ -55,4 +55,11 @@ public class PhotoService {
         }
         return photo;
     }
+
+    public void deletePhoto(Photo photo) {
+        String dirName = "ootw";
+        s3FileComponent.delete(dirName, Long.toString(photo.getId()));
+
+        photoRepository.delete(photo);
+    }
 }

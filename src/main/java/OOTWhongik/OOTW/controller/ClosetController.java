@@ -64,4 +64,11 @@ public class ClosetController {
         return closetService.getClothes(clothesId);
     }
 
+    @Operation(summary = "clothes delete", description = "옷 삭제")
+    @DeleteMapping("/clothes")
+    public ResponseEntity<?> deleteClothes(@RequestParam Long clothesId) throws Exception {
+        clothesService.deleteClothes(clothesId);
+        return ResponseEntity.ok().build();
+    }
+
 }
