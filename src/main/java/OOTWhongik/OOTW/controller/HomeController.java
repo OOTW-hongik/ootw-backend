@@ -26,8 +26,13 @@ public class HomeController {
 
     @Operation(summary = "update location", description = "update location")
     @PutMapping("/location")
-    public ResponseEntity<?> updateLocation(@RequestBody LocationUpdateRequest locationUpdateRequest) throws IOException {
+    public ResponseEntity<?> updateLocation(@RequestBody LocationUpdateRequest locationUpdateRequest) {
         homeService.updateLocation(locationUpdateRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/health_check")
+    public ResponseEntity<?> healthCheck() {
         return ResponseEntity.ok().build();
     }
 }
