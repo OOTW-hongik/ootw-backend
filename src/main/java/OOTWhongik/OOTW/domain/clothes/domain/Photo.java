@@ -1,9 +1,8 @@
 package OOTWhongik.OOTW.domain.clothes.domain;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Getter

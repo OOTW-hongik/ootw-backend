@@ -2,9 +2,8 @@ package OOTWhongik.OOTW.domain.clothes.domain;
 
 import OOTWhongik.OOTW.domain.common.BaseTimeEntity;
 import OOTWhongik.OOTW.domain.outfit.domain.Outfit;
+import jakarta.persistence.*;
 import lombok.*;
-
-import javax.persistence.*;
 
 @Entity
 @Getter

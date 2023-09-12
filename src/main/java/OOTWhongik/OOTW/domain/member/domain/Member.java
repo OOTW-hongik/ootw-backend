@@ -4,9 +4,9 @@ import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
 import OOTWhongik.OOTW.domain.common.BaseTimeEntity;
 import OOTWhongik.OOTW.domain.outfit.domain.Outfit;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Member extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
     @Column

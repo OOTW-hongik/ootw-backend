@@ -3,9 +3,9 @@ package OOTWhongik.OOTW.domain.outfit.domain;
 import OOTWhongik.OOTW.domain.clothes.domain.ClothesOutfit;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.domain.common.BaseTimeEntity;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
