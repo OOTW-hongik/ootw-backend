@@ -1,15 +1,13 @@
 package OOTWhongik.OOTW.domain.clothes.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -26,4 +24,10 @@ public class Photo {
     private String storedFilePath;
 
     private Long fileSize;
+
+    public void update(String originalFilename, String storedFilePath, Long fileSize) {
+        this.originalFileName = originalFilename;
+        this.storedFilePath = storedFilePath;
+        this.fileSize = fileSize;
+    }
 }

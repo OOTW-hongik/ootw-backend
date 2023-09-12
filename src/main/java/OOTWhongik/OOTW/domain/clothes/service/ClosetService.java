@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Service
 @Transactional
@@ -38,26 +40,21 @@ public class ClosetService {
         } else {
             throw new RuntimeException("등록된 옷이 없습니다.");
         }
-        List<String> subCategoryCollection = new ArrayList<>();
+        Set<String> subCategoryCollection = new TreeSet<>();
         List<ClothesResponse> clothesResponseParam = new ArrayList<>();
         for (Clothes clothes : clothesList) {
             if (clothes.isHidden() != hidden) continue;
-            //subcategory 가 있는지 검사하고 없으면 삽입
-            if (!subCategoryCollection.contains(clothes.getSubcategory())) {
-                subCategoryCollection.add(clothes.getSubcategory());
-            }
 
-            String photoUrl = clothes.getPhoto().getStoredFilePath();
-
+            subCategoryCollection.add(clothes.getSubcategory());
             //clothes 를 삽입
             clothesResponseParam.add(ClothesResponse.builder()
                             .clothesId(clothes.getId())
-                            .clothesUrl(photoUrl)
+                            .clothesUrl(clothes.getPhoto().getStoredFilePath())
                             .subCategory(clothes.getSubcategory())
                             .build());
         }
 
-        return new ClosetResponse(subCategoryCollection, clothesResponseParam);
+        return new ClosetResponse(new ArrayList<>(subCategoryCollection), clothesResponseParam);
     }
 
     public ClothesDetailResponse getClothes(Long clothesId) {

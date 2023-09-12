@@ -20,46 +20,26 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
 
     public Photo uploadPhoto(MultipartFile file, Long clothesId) throws IOException {
-        Photo photo = null;
-        if (file.isEmpty()) {
-            // TODO : 파일이 없을 땐 어떻게 해야할까.. 고민을 해보아야 할 것 예외처리 해야함
-        }
-        else{
-            String dirName = "ootw";
-            List<String> uploadImageUrl = s3FileComponent.upload(file, dirName, Long.toString(clothesId));
-            photo = Photo.builder()
-                    .originalFileName(file.getOriginalFilename())
-                    .storedFilePath(uploadImageUrl.get(0))
-                    .fileSize(file.getSize())
-                    .build();
-            photoRepository.save(photo);
-        }
+        List<String> uploadImageUrl = s3FileComponent.upload(file, "ootw", Long.toString(clothesId));
+        Photo photo = Photo.builder()
+                .originalFileName(file.getOriginalFilename())
+                .storedFilePath(uploadImageUrl.get(0))
+                .fileSize(file.getSize())
+                .build();
+        photoRepository.save(photo);
         return photo;
     }
 
     public Photo updatePhoto (MultipartFile file, Long clothesId, Long photoId) throws IOException {
-        Photo photo = null;
-        if (file.isEmpty()) {
-            // TODO : 파일이 없을 땐 어떻게 해야할까.. 고민을 해보아야 할 것 예외처리 해야함
-        }
-        else{
-            String dirName = "ootw";
-            List<String> uploadImageUrl = s3FileComponent.upload(file, dirName, Long.toString(clothesId));
-            photo = Photo.builder()
-                    .id(photoId)
-                    .originalFileName(file.getOriginalFilename())
-                    .storedFilePath(uploadImageUrl.get(0))
-                    .fileSize(file.getSize())
-                    .build();
-            photoRepository.save(photo);
-        }
+        Photo photo = photoRepository.findById(photoId).get();
+        List<String> uploadImageUrl = s3FileComponent.upload(file, "ootw", Long.toString(clothesId));
+        photo.update(file.getOriginalFilename(), uploadImageUrl.get(0) ,file.getSize());
+        photoRepository.save(photo);
         return photo;
     }
 
     public void deletePhoto(Photo photo) {
-        String dirName = "ootw";
-        s3FileComponent.delete(dirName, Long.toString(photo.getId()));
-
+        s3FileComponent.delete("ootw", Long.toString(photo.getId()));
         photoRepository.delete(photo);
     }
 }
