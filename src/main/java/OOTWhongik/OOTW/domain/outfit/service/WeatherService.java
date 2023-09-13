@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -49,9 +50,12 @@ public class WeatherService {
         int lowWc;
         int skyCondition = 0;
         Document httpResponse = httpConn.getCrawling(
-                "https://www.weatheri.co.kr/bygone/pastDB_tmp.php?"
-                        + "jijum_id=" + jijum_id
-                        + "&start=" + date);
+                UriComponentsBuilder
+                        .fromUriString("https://www.weatheri.co.kr/bygone/pastDB_tmp.php")
+                        .queryParam("jijum_id", jijum_id)
+                        .queryParam("start", date)
+                        .toUriString()
+        );
         Element element = httpResponse.select("tr").select("[bgcolor=#ffffff]").first();
         Elements elements = element.getAllElements();
         highTemp = Double.parseDouble(elements.get(7).text());
@@ -81,7 +85,11 @@ public class WeatherService {
         int highWc;
         int lowWc;
         Document httpResponse = httpConn.getCrawling(
-                "https://www.weatheri.co.kr/forecast/forecast01.php?rid=" + rid);
+                UriComponentsBuilder
+                        .fromUriString("https://www.weatheri.co.kr/forecast/forecast01.php")
+                        .queryParam("rid", rid)
+                        .toUriString()
+        );
         //온도 파악
         Element element = httpResponse.select("td").select(".f11").first();
         String[] tempList = element.text().split("˚C");
@@ -112,7 +120,11 @@ public class WeatherService {
     public List<WeatherGraphInfo> getWeatherGraphInfo(String location) throws IOException {
         String rid = ridMap.get(location);
         Document httpResponse = httpConn.getCrawling(
-                "https://www.weatheri.co.kr/forecast/forecast01.php?rid=" + rid);
+                UriComponentsBuilder
+                        .fromUriString("https://www.weatheri.co.kr/forecast/forecast01.php")
+                        .queryParam("rid", rid)
+                        .toUriString()
+        );
         Element element1 = httpResponse.select("table").select("[bgcolor=#BCBFC2]").get(2);
         Element element2 = element1.select("tr").select("[bgcolor=#ffffff]").get(8);
         String[] temp = element2.text().trim().split(" ");
