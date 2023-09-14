@@ -1,8 +1,8 @@
 package OOTWhongik.OOTW.domain.member.domain;
 
 import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
-import OOTWhongik.OOTW.domain.common.BaseTimeEntity;
 import OOTWhongik.OOTW.domain.outfit.domain.Outfit;
+import OOTWhongik.OOTW.global.common.BaseTimeEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -40,11 +40,6 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "owner")
     private List<Outfit> outfitList = new ArrayList<>();
 
-    public Member update(String name) {
-        this.name = name;
-
-        return this;
-    }
 
     public String getRoleKey() {
         return this.role.getKey();

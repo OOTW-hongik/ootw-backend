@@ -1,8 +1,8 @@
 package OOTWhongik.OOTW.domain.clothes.service;
 
 import OOTWhongik.OOTW.domain.clothes.domain.Photo;
-import OOTWhongik.OOTW.domain.common.filecontrol.S3FileComponent;
 import OOTWhongik.OOTW.domain.clothes.repository.PhotoRepository;
+import OOTWhongik.OOTW.global.common.filecontrol.S3FileComponent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,8 +1,8 @@
 package OOTWhongik.OOTW.domain.clothes.domain;
 
-import OOTWhongik.OOTW.domain.common.BaseTimeEntity;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.domain.clothes.dto.request.ClothesUpdateRequest;
+import OOTWhongik.OOTW.global.common.BaseTimeEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

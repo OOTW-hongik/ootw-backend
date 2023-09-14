@@ -2,7 +2,7 @@ package OOTWhongik.OOTW.domain.outfit.service;
 
 import OOTWhongik.OOTW.domain.outfit.dto.response.WeatherGraphInfo;
 import OOTWhongik.OOTW.domain.outfit.dto.response.WeatherSummary;
-import OOTWhongik.OOTW.domain.common.httpconnection.HttpConn;
+import OOTWhongik.OOTW.global.common.httpconnection.HttpConn;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

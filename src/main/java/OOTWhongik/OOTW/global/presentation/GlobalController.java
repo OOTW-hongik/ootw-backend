@@ -1,4 +1,4 @@
-package OOTWhongik.OOTW.global.controller;
+package OOTWhongik.OOTW.global.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -2,7 +2,7 @@ package OOTWhongik.OOTW.domain.outfit.domain;
 
 import OOTWhongik.OOTW.domain.clothes.domain.ClothesOutfit;
 import OOTWhongik.OOTW.domain.member.domain.Member;
-import OOTWhongik.OOTW.domain.common.BaseTimeEntity;
+import OOTWhongik.OOTW.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
