@@ -1,4 +1,4 @@
-package OOTWhongik.OOTW.domain.common;
+package OOTWhongik.OOTW.global.common;
 
 import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
 import OOTWhongik.OOTW.domain.member.domain.Member;

@@ -1,4 +1,4 @@
-package OOTWhongik.OOTW.domain.common.httpconnection;
+package OOTWhongik.OOTW.global.common.httpconnection;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;

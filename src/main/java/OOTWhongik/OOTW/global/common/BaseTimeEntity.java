@@ -1,4 +1,4 @@
-package OOTWhongik.OOTW.domain.common;
+package OOTWhongik.OOTW.global.common;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

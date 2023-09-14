@@ -1,4 +1,4 @@
-package OOTWhongik.OOTW.domain.common.filecontrol;
+package OOTWhongik.OOTW.global.common.filecontrol;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
