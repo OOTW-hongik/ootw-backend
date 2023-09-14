@@ -31,8 +31,4 @@ public class HomeController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/health_check")
-    public ResponseEntity<?> healthCheck() {
-        return ResponseEntity.ok().build();
-    }
 }
