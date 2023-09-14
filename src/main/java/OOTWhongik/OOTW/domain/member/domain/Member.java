@@ -10,12 +10,24 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static lombok.AccessLevel.PROTECTED;
+
 @Entity
 @Getter
 @Setter
 @Builder
-@RequiredArgsConstructor
+@NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
+@Table(uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "oauth_id_unique",
+                        columnNames = {
+                                "oauth_server_id",
+                                "oauth_server"
+                        }
+                ),
+        }
+)
 public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +39,8 @@ public class Member extends BaseTimeEntity {
     private String email;
     @Column
     private String location;
+    @Embedded
+    private OauthId oauthId;
 
     @Enumerated(EnumType.STRING)
     @Column
