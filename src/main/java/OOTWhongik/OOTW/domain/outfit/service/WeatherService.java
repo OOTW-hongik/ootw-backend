@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -22,6 +23,13 @@ import java.util.*;
 public class WeatherService {
 
     private final HttpConn httpConn;
+
+    @Value("${weather.url.past}")
+    private String pastUrl;
+
+    @Value("${weather.url.today}")
+    private String todayUrl;
+
 
     public static double calcWc (double temp, double velocity) {
         return 13.12 + 0.6215 * temp - 11.37 * Math.pow(velocity, 0.16) + 0.3965 * Math.pow(velocity, 0.16) * temp;
@@ -51,7 +59,7 @@ public class WeatherService {
         int skyCondition = 0;
         Document httpResponse = httpConn.getCrawling(
                 UriComponentsBuilder
-                        .fromUriString("https://www.weatheri.co.kr/bygone/pastDB_tmp.php")
+                        .fromUriString(pastUrl)
                         .queryParam("jijum_id", jijum_id)
                         .queryParam("start", date)
                         .toUriString()
@@ -86,7 +94,7 @@ public class WeatherService {
         int lowWc;
         Document httpResponse = httpConn.getCrawling(
                 UriComponentsBuilder
-                        .fromUriString("https://www.weatheri.co.kr/forecast/forecast01.php")
+                        .fromUriString(todayUrl)
                         .queryParam("rid", rid)
                         .toUriString()
         );
@@ -121,7 +129,7 @@ public class WeatherService {
         String rid = ridMap.get(location);
         Document httpResponse = httpConn.getCrawling(
                 UriComponentsBuilder
-                        .fromUriString("https://www.weatheri.co.kr/forecast/forecast01.php")
+                        .fromUriString(todayUrl)
                         .queryParam("rid", rid)
                         .toUriString()
         );

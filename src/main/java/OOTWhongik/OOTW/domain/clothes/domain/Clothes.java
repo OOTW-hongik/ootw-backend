@@ -39,7 +39,7 @@ public class Clothes extends BaseTimeEntity {
     @OneToMany(mappedBy = "clothes")
     private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "photo_id")
     private Photo photo;
 
