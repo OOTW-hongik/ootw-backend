@@ -7,13 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -40,17 +38,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         log.info("token : {}", token);
 
-        //토큰이 Valid한지 확인하기
+        //토큰이 Valid한지 확인
         if(JwtUtils.getExpiration(token) < 0){
             filterChain.doFilter(request, response);
             return;
         }
 
-        String email = JwtUtils.getEmailFromToken(token);
-        String role = JwtUtils.getRoleFromToken(token);
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(email, "", List.of(new SimpleGrantedAuthority(role)));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        Authentication authentication = JwtUtils.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // SecurityUtil.getMemberId() 로 현재 로그인된 ID 찾아올 수 있음
         filterChain.doFilter(request, response);
     }
 
