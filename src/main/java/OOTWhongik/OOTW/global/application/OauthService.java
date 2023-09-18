@@ -5,6 +5,7 @@ import OOTWhongik.OOTW.domain.member.domain.OauthServerType;
 import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
 import OOTWhongik.OOTW.global.auth.authcode.AuthCodeRequestUrlProviderComposite;
 import OOTWhongik.OOTW.global.client.OauthMemberClientComposite;
+import OOTWhongik.OOTW.global.config.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,10 @@ public class OauthService {
         return authCodeRequestUrlProviderComposite.provide(oauthServerType);
     }
 
-    // 추가
-    public Long login(OauthServerType oauthServerType, String authCode) {
+    public String login(OauthServerType oauthServerType, String authCode) {
         Member member = oauthMemberClientComposite.fetch(oauthServerType, authCode);
         Member saved = memberRepository.findByOauthId(member.getOauthId())
                 .orElseGet(() -> memberRepository.save(member));
-        return saved.getId();
+        return JwtUtils.createToken(saved);
     }
 }
