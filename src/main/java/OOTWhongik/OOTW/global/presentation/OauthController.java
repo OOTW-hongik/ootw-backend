@@ -2,6 +2,7 @@ package OOTWhongik.OOTW.global.presentation;
 
 import OOTWhongik.OOTW.domain.member.domain.OauthServerType;
 import OOTWhongik.OOTW.global.application.OauthService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -30,7 +31,7 @@ public class OauthController {
     ResponseEntity<?> login(
             @PathVariable OauthServerType oauthServerType,
             @RequestParam("code") String code
-    ) {
+    ) throws JsonProcessingException {
         String login = oauthService.login(oauthServerType, code);
         return ResponseEntity.ok(login);
     }
