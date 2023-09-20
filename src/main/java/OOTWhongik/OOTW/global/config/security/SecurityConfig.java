@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;
 
 @Configuration
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class SecurityConfig { //WebSecurityConfigurerAdapter was deprecated
         http.csrf(csrf -> csrf.disable());
         http.authorizeHttpRequests(authorize ->
                 authorize.requestMatchers(WHITE_LIST).permitAll()
+                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .anyRequest().authenticated());
         http.formLogin(form -> form.disable());
         http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
