@@ -15,7 +15,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000/",
+                .allowedOrigins(
+                        "http://localhost:3000/",
                         "https://ootw.store/",
                         "https://www.ootw.store/")
                 .allowedMethods(
@@ -23,7 +24,8 @@ public class WebConfig implements WebMvcConfigurer {
                         HttpMethod.POST.name(),
                         HttpMethod.PUT.name(),
                         HttpMethod.DELETE.name(),
-                        HttpMethod.PATCH.name()
+                        HttpMethod.PATCH.name(),
+                        HttpMethod.OPTIONS.name()
                 )
                 .allowCredentials(true)
                 .exposedHeaders("*");
