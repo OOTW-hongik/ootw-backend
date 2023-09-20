@@ -28,6 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
                         HttpMethod.OPTIONS.name()
                 )
                 .allowCredentials(true)
+                .allowedHeaders("*")
                 .exposedHeaders("*");
     }
 
