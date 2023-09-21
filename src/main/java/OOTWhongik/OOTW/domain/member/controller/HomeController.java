@@ -1,6 +1,6 @@
 package OOTWhongik.OOTW.domain.member.controller;
 
-import OOTWhongik.OOTW.domain.member.dto.request.LocationUpdateRequest;
+import OOTWhongik.OOTW.domain.member.dto.request.LocationRequest;
 import OOTWhongik.OOTW.domain.member.dto.response.HomeResponse;
 import OOTWhongik.OOTW.domain.member.service.HomeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,14 +20,14 @@ public class HomeController {
 
     @Operation(summary = "home", description = "home")
     @GetMapping
-    public HomeResponse home(@RequestParam Long memberId) throws IOException {
-        return homeService.getHome(memberId);
+    public HomeResponse home() throws IOException {
+        return homeService.getHome();
     }
 
     @Operation(summary = "update location", description = "update location")
     @PutMapping("/location")
-    public ResponseEntity<?> updateLocation(@RequestBody LocationUpdateRequest locationUpdateRequest) {
-        homeService.updateLocation(locationUpdateRequest);
+    public ResponseEntity<?> updateLocation(@RequestBody LocationRequest locationRequest) {
+        homeService.updateLocation(locationRequest);
         return ResponseEntity.ok().build();
     }
 

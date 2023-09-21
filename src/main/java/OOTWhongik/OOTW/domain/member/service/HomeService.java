@@ -3,12 +3,13 @@ package OOTWhongik.OOTW.domain.member.service;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.domain.outfit.dto.response.WeatherGraphInfo;
 import OOTWhongik.OOTW.domain.outfit.dto.response.WeatherSummary;
-import OOTWhongik.OOTW.domain.member.dto.request.LocationUpdateRequest;
+import OOTWhongik.OOTW.domain.member.dto.request.LocationRequest;
 import OOTWhongik.OOTW.domain.member.dto.response.HomeResponse;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitSummary;
 import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
 import OOTWhongik.OOTW.domain.outfit.service.OutfitService;
 import OOTWhongik.OOTW.domain.outfit.service.WeatherService;
+import OOTWhongik.OOTW.global.config.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,8 @@ public class HomeService {
     private final WeatherService weatherService;
     private final MemberRepository memberRepository;
 
-    public HomeResponse getHome(Long memberId) throws IOException {
+    public HomeResponse getHome() throws IOException {
+        Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId).get();
         WeatherSummary weatherSummary = weatherService.getTodayWeather(member.getLocation());
         List<WeatherGraphInfo> weatherGraphInfoList = weatherService.getWeatherGraphInfo(member.getLocation());
@@ -43,8 +45,9 @@ public class HomeService {
     }
 
     @Transactional
-    public void updateLocation(LocationUpdateRequest locationUpdateRequest) {
-        Member member = memberRepository.findById(locationUpdateRequest.getMemberId()).get();
-        member.setLocation(locationUpdateRequest.getLocation());
+    public void updateLocation(LocationRequest locationRequest) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.findById(memberId).get();
+        member.setLocation(locationRequest.getLocation());
     }
 }

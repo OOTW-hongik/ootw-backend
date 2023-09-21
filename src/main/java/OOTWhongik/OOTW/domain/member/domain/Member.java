@@ -14,7 +14,6 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
@@ -57,5 +56,9 @@ public class Member extends BaseTimeEntity {
 
     public String getRoleKey() {
         return this.role.getKey();
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }
