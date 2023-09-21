@@ -6,7 +6,6 @@ import java.util.List;
 
 @Getter
 public class OutfitRequest {
-    private Long memberId;
     private String outfitDate;
     private String outfitLocation;
     private int skyCondition;

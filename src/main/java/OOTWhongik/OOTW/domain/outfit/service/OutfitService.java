@@ -4,7 +4,6 @@ import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
 import OOTWhongik.OOTW.domain.clothes.domain.ClothesOutfit;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.domain.outfit.domain.Outfit;
-import OOTWhongik.OOTW.domain.outfit.dto.request.OutfitUpdateRequest;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitDetailResponse;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitSummary;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitListResponse;
@@ -13,6 +12,7 @@ import OOTWhongik.OOTW.domain.clothes.repository.ClothesOutfitRepository;
 import OOTWhongik.OOTW.domain.clothes.repository.ClothesRepository;
 import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
 import OOTWhongik.OOTW.domain.outfit.repository.OutfitRepository;
+import OOTWhongik.OOTW.global.config.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +32,8 @@ public class OutfitService {
 
     @Transactional
     public void saveOutfit(OutfitRequest outfitRequest) {
-        Member owner = memberRepository.findById(outfitRequest.getMemberId()).get();
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member owner = memberRepository.findById(memberId).get();
         Outfit outfit = Outfit.builder()
                 .owner(owner)
                 .outfitDate(outfitRequest.getOutfitDate())
@@ -66,29 +67,31 @@ public class OutfitService {
     }
 
     @Transactional
-    public void updateOutfit(OutfitUpdateRequest outfitUpdateRequest) {
-        Outfit outfit = outfitRepository.findById(outfitUpdateRequest.getOutfitId()).get();
-        outfit.setOutfitDate(outfitUpdateRequest.getOutfitDate());
-        outfit.setOutfitLocation(outfitUpdateRequest.getOutfitLocation());
-        outfit.setHighWc(outfitUpdateRequest.getHighWc());
-        outfit.setLowWc(outfitUpdateRequest.getLowWc());
-        outfit.setHighTemp(outfitUpdateRequest.getHighTemp());
-        outfit.setLowTemp(outfitUpdateRequest.getLowTemp());
-        outfit.setOuterRating(outfitUpdateRequest.getOuterRating());
-        outfit.setTopRating(outfitUpdateRequest.getTopRating());
-        outfit.setBottomRating(outfitUpdateRequest.getBottomRating());
-        outfit.setOutfitComment(outfitUpdateRequest.getOutfitComment());
-        outfit.setSkyCondition(outfitUpdateRequest.getSkyCondition());
+    public void updateOutfit(Long outfitId, OutfitRequest outfitRequest) throws Exception {
+        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
+        Outfit outfit = outfitRepository.findById(outfitId).get();
+        if (!isOwner(member, outfit)) {
+            throw new Exception("착장의 소유주가 아닙니다.");
+        }
+        outfit.setOutfitDate(outfitRequest.getOutfitDate());
+        outfit.setOutfitLocation(outfitRequest.getOutfitLocation());
+        outfit.setHighWc(outfitRequest.getHighWc());
+        outfit.setLowWc(outfitRequest.getLowWc());
+        outfit.setHighTemp(outfitRequest.getHighTemp());
+        outfit.setLowTemp(outfitRequest.getLowTemp());
+        outfit.setOuterRating(outfitRequest.getOuterRating());
+        outfit.setTopRating(outfitRequest.getTopRating());
+        outfit.setBottomRating(outfitRequest.getBottomRating());
+        outfit.setOutfitComment(outfitRequest.getOutfitComment());
+        outfit.setSkyCondition(outfitRequest.getSkyCondition());
         List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
         List<Long> clothesList = new ArrayList<>();
-        clothesList.addAll(outfitUpdateRequest.getOuterIdList());
-        clothesList.addAll(outfitUpdateRequest.getTopIdList());
-        clothesList.addAll(outfitUpdateRequest.getBottomIdList());
-        clothesList.addAll(outfitUpdateRequest.getEtcIdList());
+        clothesList.addAll(outfitRequest.getOuterIdList());
+        clothesList.addAll(outfitRequest.getTopIdList());
+        clothesList.addAll(outfitRequest.getBottomIdList());
+        clothesList.addAll(outfitRequest.getEtcIdList());
         for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
-//            if (!clothesList.contains(clothesOutfit.getClothes().getId())) {
                 clothesOutfitRepository.deleteClothesOutfit(clothesOutfit.getId());
-//            }
         }
         for (Long clothesId : clothesList) {
             Clothes clothes = clothesRepository.findById(clothesId).get();
@@ -119,21 +122,21 @@ public class OutfitService {
             for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
                 Clothes clothes = clothesOutfit.getClothes();
                 switch (clothes.getCategory()) {
-                    case "아우터":
+                    case "아우터" -> {
                         cntOuter++;
                         if (mainOuter == null)
                             mainOuter = clothes;
-                        break;
-                    case "상의":
+                    }
+                    case "상의" -> {
                         cntTop++;
                         if (mainTop == null)
                             mainTop = clothes;
-                        break;
-                    case "하의":
+                    }
+                    case "하의" -> {
                         cntBottom++;
                         if (mainBottom == null)
                             mainBottom = clothes;
-                        break;
+                    }
                 }
             }
             OutfitSummary outfitSummary = OutfitSummary.builder()
@@ -150,26 +153,39 @@ public class OutfitService {
         return outfitSummaryList;
     }
 
-    public OutfitListResponse getOutfitList(Long memberId) {
+    public OutfitListResponse getOutfitList() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId).get();
         String name = member.getName();
         List<OutfitSummary> outfitSummaryList = getOutfitSummaryList(member);
         return new OutfitListResponse(name, outfitSummaryList);
     }
 
-    public OutfitDetailResponse getOutfitDetail(Long outfitId) {
+    public OutfitDetailResponse getOutfitDetail(Long outfitId) throws Exception {
+        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
         Outfit outfit = outfitRepository.findById(outfitId).get();
+        if (!isOwner(member, outfit)) {
+            throw new Exception("착장의 소유주가 아닙니다.");
+        }
         return OutfitDetailResponse.builder()
                 .outfit(outfit)
                 .build();
     }
 
     @Transactional
-    public void deleteOutfit(Long outfitId) {
+    public void deleteOutfit(Long outfitId) throws Exception {
+        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
         Outfit outfit = outfitRepository.findById(outfitId).get();
+        if (!isOwner(member, outfit)) {
+            throw new Exception("착장의 소유주가 아닙니다.");
+        }
         for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
             clothesOutfitRepository.deleteClothesOutfit(clothesOutfit.getId());
         }
         outfitRepository.deleteOutfit(outfit.getId());
+    }
+
+    private boolean isOwner(Member member, Outfit outfit) {
+        return outfit.getOwner() == member;
     }
 }
