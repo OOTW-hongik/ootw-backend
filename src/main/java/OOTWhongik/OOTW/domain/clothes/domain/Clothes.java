@@ -1,7 +1,7 @@
 package OOTWhongik.OOTW.domain.clothes.domain;
 
+import OOTWhongik.OOTW.domain.clothes.dto.request.ClothesRequest;
 import OOTWhongik.OOTW.domain.member.domain.Member;
-import OOTWhongik.OOTW.domain.clothes.dto.request.ClothesUpdateRequest;
 import OOTWhongik.OOTW.global.common.BaseTimeEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -39,7 +39,7 @@ public class Clothes extends BaseTimeEntity {
     @OneToMany(mappedBy = "clothes")
     private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "photo_id")
     private Photo photo;
 
@@ -47,10 +47,15 @@ public class Clothes extends BaseTimeEntity {
         this.photo = photo;
     }
 
-    public void update(ClothesUpdateRequest clothesUpdateRequest) {
-        this.category = clothesUpdateRequest.getCategory();
-        this.subcategory = clothesUpdateRequest.getSubCategory();
-        this.clothesComment = clothesUpdateRequest.getClothesComment();
-        this.hidden = clothesUpdateRequest.isHidden();
+    public void update(ClothesRequest clothesRequest) {
+        this.category = clothesRequest.getCategory();
+        this.subcategory = clothesRequest.getSubCategory();
+        this.clothesComment = clothesRequest.getClothesComment();
+        this.hidden = clothesRequest.isHidden();
+    }
+
+    public void addMember(Member member) {
+        member.getClothesList().add(this);
+        this.member = member;
     }
 }

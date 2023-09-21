@@ -1,6 +1,5 @@
 package OOTWhongik.OOTW.domain.clothes.controller;
 
-import OOTWhongik.OOTW.domain.clothes.dto.request.ClothesUpdateRequest;
 import OOTWhongik.OOTW.domain.clothes.dto.response.ClosetResponse;
 import OOTWhongik.OOTW.domain.clothes.dto.request.ClothesRequest;
 import OOTWhongik.OOTW.domain.clothes.dto.response.ClothesDetailResponse;
@@ -25,14 +24,14 @@ public class ClosetController {
 
     @Operation(summary = "closet", description = "옷장 페이지")
     @GetMapping("/closet")
-    public ClosetResponse getCloset(@RequestParam Long memberId, @RequestParam String category) {
-        return closetService.getCloset(memberId, category);
+    public ClosetResponse getCloset(@RequestParam String category) {
+        return closetService.getCloset(category);
     }
 
     @Operation(summary = "hidden closet", description = "숨긴 옷장 페이지")
     @GetMapping("/closet/hidden")
-    public ClosetResponse getHiddenCloset(@RequestParam Long memberId, @RequestParam String category) {
-        return closetService.getHiddenCloset(memberId, category);
+    public ClosetResponse getHiddenCloset(@RequestParam String category) {
+        return closetService.getHiddenCloset(category);
     }
 
     @Operation(summary = "clothes creation", description = "옷 등록")
@@ -44,29 +43,31 @@ public class ClosetController {
     }
 
     @Operation(summary = "clothes update", description = "옷 수정")
-    @PutMapping("/clothes")
-    public ResponseEntity<?> updateClothes(@RequestPart ClothesUpdateRequest clothesUpdateRequest,
-                                           @RequestPart MultipartFile clothesPhoto) throws IOException {
-        clothesService.updateClothes(clothesUpdateRequest, clothesPhoto);
+    @PutMapping("/clothes/{clothesId}")
+    public ResponseEntity<?> updateClothes(@PathVariable Long clothesId,
+                                           @RequestPart ClothesRequest clothesRequest,
+                                           @RequestPart MultipartFile clothesPhoto) throws Exception {
+        clothesService.updateClothes(clothesId, clothesRequest, clothesPhoto);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "clothes update", description = "사진제외 옷 수정")
-    @PatchMapping("/clothes")
-    public ResponseEntity<?> updateClothesWithoutPhoto(@RequestBody ClothesUpdateRequest clothesUpdateRequest) {
-        clothesService.updateClothes(clothesUpdateRequest);
+    @PatchMapping("/clothes/{clothesId}")
+    public ResponseEntity<?> updateClothesWithoutPhoto(@PathVariable Long clothesId,
+                                                       @RequestBody ClothesRequest clothesRequest) throws Exception {
+        clothesService.updateClothes(clothesId, clothesRequest);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "clothes detail", description = "옷 상세 페이지")
-    @GetMapping("/clothes")
-    public ClothesDetailResponse getClothes(@RequestParam Long clothesId) {
+    @GetMapping("/clothes/{clothesId}")
+    public ClothesDetailResponse getClothes(@PathVariable Long clothesId) {
         return closetService.getClothes(clothesId);
     }
 
     @Operation(summary = "clothes delete", description = "옷 삭제")
-    @DeleteMapping("/clothes")
-    public ResponseEntity<?> deleteClothes(@RequestParam Long clothesId) throws Exception {
+    @DeleteMapping("/clothes/{clothesId}")
+    public ResponseEntity<?> deleteClothes(@PathVariable Long clothesId) throws Exception {
         clothesService.deleteClothes(clothesId);
         return ResponseEntity.ok().build();
     }

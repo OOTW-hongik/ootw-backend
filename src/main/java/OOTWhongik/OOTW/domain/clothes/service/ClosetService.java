@@ -7,6 +7,7 @@ import OOTWhongik.OOTW.domain.clothes.dto.response.ClothesDetailResponse;
 import OOTWhongik.OOTW.domain.clothes.dto.response.ClothesResponse;
 import OOTWhongik.OOTW.domain.clothes.repository.ClothesRepository;
 import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
+import OOTWhongik.OOTW.global.config.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,15 +25,16 @@ public class ClosetService {
     private final ClothesRepository clothesRepository;
     private final MemberRepository memberRepository;
 
-    public ClosetResponse getCloset(Long memberId, String category) {
-        return getCloset(memberId, category, false);
+    public ClosetResponse getCloset(String category) {
+        return getCloset(category, false);
     }
 
-    public ClosetResponse getHiddenCloset(Long memberId, String category) {
-        return getCloset(memberId, category, true);
+    public ClosetResponse getHiddenCloset(String category) {
+        return getCloset(category, true);
     }
 
-    public ClosetResponse getCloset(Long memberId, String category, boolean hidden) {
+    public ClosetResponse getCloset(String category, boolean hidden) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId).get();
         List<Clothes> clothesList;
         if (clothesRepository.findAllByMemberAndCategory(member, category).isPresent()) {
