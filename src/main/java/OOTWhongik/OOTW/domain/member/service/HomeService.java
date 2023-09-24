@@ -30,7 +30,9 @@ public class HomeService {
         Member member = memberRepository.findById(memberId).get();
         WeatherSummary weatherSummary = weatherService.getTodayWeather(member.getLocation());
         List<WeatherGraphInfo> weatherGraphInfoList = weatherService.getWeatherGraphInfo(member.getLocation());
-        List<OutfitSummary> outfitSummaryList =  outfitService.getOutfitSummaryList(member).subList(0, 3); //TODO : 바꿔야 함
+//        List<OutfitSummary> outfitSummaryList =  outfitService.getOutfitSummaryList(member).subList(0, 3);
+        List<OutfitSummary> outfitSummaryList = outfitService.getOutfitSummaryList(member);
+        if (outfitSummaryList.size() > 3) outfitSummaryList = outfitSummaryList.subList(0, 3);
         return HomeResponse.builder()
                 .name(member.getName())
                 .location(member.getLocation())
