@@ -36,7 +36,7 @@ public class Outfit extends BaseTimeEntity {
 
     private int skyCondition;
     private String outfitComment;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private Member owner;
 

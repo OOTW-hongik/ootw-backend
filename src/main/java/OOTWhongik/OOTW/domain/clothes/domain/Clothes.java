@@ -31,7 +31,7 @@ public class Clothes extends BaseTimeEntity {
 
     private boolean hidden;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
@@ -39,7 +39,7 @@ public class Clothes extends BaseTimeEntity {
     @OneToMany(mappedBy = "clothes")
     private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "photo_id")
     private Photo photo;
 
