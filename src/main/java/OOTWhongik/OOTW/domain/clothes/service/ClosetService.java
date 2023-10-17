@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ClosetService {
 

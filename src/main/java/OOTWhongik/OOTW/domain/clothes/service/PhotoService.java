@@ -12,13 +12,14 @@ import java.io.IOException;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PhotoService {
 
     private final S3FileComponent s3FileComponent;
     private final PhotoRepository photoRepository;
 
+    @Transactional
     public Photo uploadPhoto(MultipartFile file, Long clothesId) throws IOException {
         List<String> uploadImageUrl = s3FileComponent.upload(file, "ootw", Long.toString(clothesId));
         Photo photo = Photo.builder()
@@ -30,6 +31,7 @@ public class PhotoService {
         return photo;
     }
 
+    @Transactional
     public Photo updatePhoto (MultipartFile file, Long clothesId, Long photoId) throws IOException {
         Photo photo = photoRepository.findById(photoId).get();
         List<String> uploadImageUrl = s3FileComponent.upload(file, "ootw", Long.toString(clothesId));
@@ -38,6 +40,7 @@ public class PhotoService {
         return photo;
     }
 
+    @Transactional
     public void deletePhoto(Photo photo) {
         s3FileComponent.delete("ootw", Long.toString(photo.getId()));
         photoRepository.delete(photo);
