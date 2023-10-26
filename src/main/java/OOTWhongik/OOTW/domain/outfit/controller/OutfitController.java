@@ -24,7 +24,7 @@ public class OutfitController {
 
     @Operation(summary = "outfit list", description = "착장 리스트 조회")
     @GetMapping("/list")
-    public OutfitListResponse getOutfitList () {
+    public OutfitListResponse getOutfitList () throws IOException {
         return outfitService.getOutfitList();
     }
 
@@ -36,7 +36,8 @@ public class OutfitController {
 
     @Operation(summary = "outfit register", description = "착장 생성 시 날씨 조회")
     @GetMapping("/register")
-    public WeatherSummary outfitRegister(@RequestParam String outfitDate, @RequestParam String outfitLocation) throws IOException {
+    public WeatherSummary outfitRegister(@RequestParam String outfitDate,
+                                         @RequestParam String outfitLocation) throws IOException {
         return weatherService.getWeatherInfo(outfitDate, outfitLocation);
     }
 

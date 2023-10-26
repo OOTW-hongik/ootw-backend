@@ -11,8 +11,10 @@ import OOTWhongik.OOTW.domain.outfit.dto.request.OutfitRequest;
 import OOTWhongik.OOTW.domain.clothes.repository.ClothesOutfitRepository;
 import OOTWhongik.OOTW.domain.clothes.repository.ClothesRepository;
 import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
+import OOTWhongik.OOTW.domain.outfit.dto.response.WeatherSummary;
 import OOTWhongik.OOTW.domain.outfit.repository.OutfitRepository;
 import OOTWhongik.OOTW.global.config.security.SecurityUtil;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,8 @@ public class OutfitService {
     private final MemberRepository memberRepository;
     private final ClothesRepository clothesRepository;
     private final ClothesOutfitRepository clothesOutfitRepository;
+    private final WeatherService weatherService;
+
 
     @Transactional
     public void saveOutfit(OutfitRequest outfitRequest) {
@@ -91,7 +95,7 @@ public class OutfitService {
         clothesList.addAll(outfitRequest.getBottomIdList());
         clothesList.addAll(outfitRequest.getEtcIdList());
         for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
-                clothesOutfitRepository.deleteClothesOutfit(clothesOutfit.getId());
+            clothesOutfitRepository.deleteClothesOutfit(clothesOutfit.getId());
         }
         for (Long clothesId : clothesList) {
             Clothes clothes = clothesRepository.findById(clothesId).get();
@@ -109,7 +113,7 @@ public class OutfitService {
         outfitRepository.save(outfit);
     }
 
-    public List<OutfitSummary> getOutfitSummaryList(Member member) {
+    public List<OutfitSummary> getOutfitSummaryList(Member member) throws IOException {
         List<Outfit> outfitList = member.getOutfitList();
         List<OutfitSummary> outfitSummaryList = new ArrayList<>();
         for (Outfit outfit : outfitList) {
@@ -124,18 +128,21 @@ public class OutfitService {
                 switch (clothes.getCategory()) {
                     case "아우터" -> {
                         cntOuter++;
-                        if (mainOuter == null)
+                        if (mainOuter == null) {
                             mainOuter = clothes;
+                        }
                     }
                     case "상의" -> {
                         cntTop++;
-                        if (mainTop == null)
+                        if (mainTop == null) {
                             mainTop = clothes;
+                        }
                     }
                     case "하의" -> {
                         cntBottom++;
-                        if (mainBottom == null)
+                        if (mainBottom == null) {
                             mainBottom = clothes;
+                        }
                     }
                 }
             }
@@ -150,10 +157,23 @@ public class OutfitService {
                     .build();
             outfitSummaryList.add(outfitSummary);
         }
+        WeatherSummary todayWeather = weatherService.getTodayWeather(member.getLocation());
+        outfitSummaryList.sort(((o1, o2) -> weatherDiff(o1, todayWeather) - weatherDiff(o2, todayWeather)));
         return outfitSummaryList;
     }
 
-    public OutfitListResponse getOutfitList() {
+    private int weatherDiff(OutfitSummary outfitSummary, WeatherSummary todayWeather) {
+        int highWcDiff = outfitSummary.getHighWc() - todayWeather.getHighWc();
+        int lowWcDiff = outfitSummary.getLowWc() - todayWeather.getLowWc();
+        int highTempDiff = outfitSummary.getHighTemp() - todayWeather.getHighTemp();
+        int lowTempDiff = outfitSummary.getLowTemp() - todayWeather.getLowTemp();
+        return highWcDiff * highWcDiff +
+                lowWcDiff * lowWcDiff +
+                highTempDiff * lowTempDiff +
+                lowTempDiff * lowTempDiff;
+    }
+
+    public OutfitListResponse getOutfitList() throws IOException {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId).get();
         String name = member.getName();
