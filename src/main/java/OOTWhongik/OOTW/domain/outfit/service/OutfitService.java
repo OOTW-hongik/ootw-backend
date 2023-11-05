@@ -4,6 +4,7 @@ import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
 import OOTWhongik.OOTW.domain.clothes.domain.ClothesOutfit;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.domain.outfit.domain.Outfit;
+import OOTWhongik.OOTW.domain.outfit.dto.WindChillDto;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitDetailResponse;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitSummary;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitListResponse;
@@ -11,10 +12,10 @@ import OOTWhongik.OOTW.domain.outfit.dto.request.OutfitRequest;
 import OOTWhongik.OOTW.domain.clothes.repository.ClothesOutfitRepository;
 import OOTWhongik.OOTW.domain.clothes.repository.ClothesRepository;
 import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
-import OOTWhongik.OOTW.domain.outfit.dto.response.WeatherSummary;
 import OOTWhongik.OOTW.domain.outfit.repository.OutfitRepository;
 import OOTWhongik.OOTW.global.config.security.SecurityUtil;
 import java.io.IOException;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,9 +40,11 @@ public class OutfitService {
     private double ratingWeight;
 
     @Transactional
-    public void saveOutfit(OutfitRequest outfitRequest) {
+    public void saveOutfit(OutfitRequest outfitRequest) throws IOException {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member owner = memberRepository.findById(memberId).get();
+        WindChillDto windChillDto =
+                weatherUtil.getWindChill(outfitRequest.getOutfitDate(), outfitRequest.getOutfitLocation());
         Outfit outfit = Outfit.builder()
                 .owner(owner)
                 .outfitDate(outfitRequest.getOutfitDate())
@@ -57,6 +60,13 @@ public class OutfitService {
                 .outfitComment(outfitRequest.getOutfitComment())
                 .skyCondition(outfitRequest.getSkyCondition())
                 .clothesOutfitList(new ArrayList<>())
+                .wcAt6(windChillDto.getWcAt6())
+                .wcAt9(windChillDto.getWcAt9())
+                .wcAt12(windChillDto.getWcAt12())
+                .wcAt15(windChillDto.getWcAt15())
+                .wcAt18(windChillDto.getWcAt18())
+                .wcAt21(windChillDto.getWcAt21())
+                .wcAt24(windChillDto.getWcAt24())
                 .build();
         List<Long> clothesList = new ArrayList<>();
         clothesList.addAll(outfitRequest.getOuterIdList());
@@ -119,6 +129,9 @@ public class OutfitService {
 
     public List<OutfitSummary> getOutfitSummaryList(Member member) throws IOException {
         List<Outfit> outfitList = member.getOutfitList();
+        WindChillDto todayWindChill = weatherUtil.getTodayWindChill(member.getLocation());
+        outfitList.sort(
+                ((o1, o2) -> (int) (calcDissimilarity(o1, todayWindChill) - calcDissimilarity(o2, todayWindChill))));
         List<OutfitSummary> outfitSummaryList = new ArrayList<>();
         for (Outfit outfit : outfitList) {
             int cntOuter = 0;
@@ -161,24 +174,24 @@ public class OutfitService {
                     .build();
             outfitSummaryList.add(outfitSummary);
         }
-        WeatherSummary todayWeather = weatherUtil.getTodayWeather(member.getLocation());
-        outfitSummaryList.sort(((o1, o2) -> (int) (calcDissimilarity(o1, todayWeather) - calcDissimilarity(o2, todayWeather))));
         return outfitSummaryList;
     }
 
-    private double calcDissimilarity(OutfitSummary outfitSummary, WeatherSummary todayWeather) {
-        int highWcDiff = outfitSummary.getHighWc() - todayWeather.getHighWc();
-        int lowWcDiff = outfitSummary.getLowWc() - todayWeather.getLowWc();
-        int highTempDiff = outfitSummary.getHighTemp() - todayWeather.getHighTemp();
-        int lowTempDiff = outfitSummary.getLowTemp() - todayWeather.getLowTemp();
-        int tempDissimilarity = highWcDiff * highWcDiff +
-                lowWcDiff * lowWcDiff +
-                highTempDiff * lowTempDiff +
-                lowTempDiff * lowTempDiff;
+    private double calcDissimilarity(Outfit outfit, WindChillDto todayWindChill) {
+        int[] windChillDiff = {
+                outfit.getWcAt6() - todayWindChill.getWcAt6(),
+                outfit.getWcAt9() - todayWindChill.getWcAt9(),
+                outfit.getWcAt12() - todayWindChill.getWcAt12(),
+                outfit.getWcAt15() - todayWindChill.getWcAt15(),
+                outfit.getWcAt18() - todayWindChill.getWcAt18(),
+                outfit.getWcAt21() - todayWindChill.getWcAt21(),
+                outfit.getWcAt24() - todayWindChill.getWcAt24()
+        };
+        int tempDissimilarity = Arrays.stream(windChillDiff).map(wc -> wc * wc).sum();
         double ratingDissimilarity = ratingWeight *
-                ((outfitSummary.getOuterRating() - 3) * (outfitSummary.getOuterRating() - 3)
-                + (outfitSummary.getTopRating() - 3) * (outfitSummary.getTopRating() - 3)
-                + (outfitSummary.getBottomRating() - 3) * (outfitSummary.getBottomRating() - 3));
+                ((outfit.getOuterRating() - 3) * (outfit.getOuterRating() - 3)
+                        + (outfit.getTopRating() - 3) * (outfit.getTopRating() - 3)
+                        + (outfit.getBottomRating() - 3) * (outfit.getBottomRating() - 3));
         return tempDissimilarity + ratingDissimilarity;
     }
 

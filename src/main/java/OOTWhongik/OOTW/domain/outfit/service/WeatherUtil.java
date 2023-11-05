@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.domain.outfit.service;
 
+import OOTWhongik.OOTW.domain.outfit.dto.WindChillDto;
 import OOTWhongik.OOTW.domain.outfit.dto.response.WeatherGraphInfo;
 import OOTWhongik.OOTW.domain.outfit.dto.response.WeatherSummary;
 import OOTWhongik.OOTW.global.common.httpconnection.HttpConn;
@@ -9,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -28,6 +30,8 @@ public class WeatherUtil {
     @Value("${weather.url.today}")
     private String todayUrl;
 
+    @Value("${weather.api.auth_key}")
+    private String authKey;
 
     public static double tempToWc (double temp, double velocity) {
         return 13.12 + 0.6215 * temp - 11.37 * Math.pow(velocity, 0.16) + 0.3965 * Math.pow(velocity, 0.16) * temp;
@@ -142,6 +146,77 @@ public class WeatherUtil {
                             .build());
         }
         return weatherGraphInfoList;
+    }
+
+    public WindChillDto getWindChill(String outfitDate, String outfitLocation) throws IOException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formatedNow = LocalDate.now().format(formatter);
+        System.out.println("formatedNow = " + formatedNow);
+        if (formatedNow.equals(outfitDate.substring(0, 10))) {
+            //오늘이면
+            return getTodayWindChill(outfitLocation);
+        } else {
+            //과거이면
+            return getPastWindChill(outfitDate, outfitLocation);
+        }
+    }
+
+    public WindChillDto getTodayWindChill(String outfitLocation) throws IOException {
+        String rid = ridMap.get(outfitLocation);
+        Document httpResponse = httpConn.getCrawling(
+                UriComponentsBuilder
+                        .fromUriString(todayUrl)
+                        .queryParam("rid", rid)
+                        .toUriString()
+        );
+        Element element1 = httpResponse.select("table").select("[bgcolor=#BCBFC2]").get(2);
+        Element element2 = element1.select("tr").select("[bgcolor=#ffffff]").get(8);
+        Element element3 = element1.select("tr").select("[bgcolor=#ffffff]").get(10);
+        String[] temp = element2.text().trim().split(" ");
+        String[] velocity = element3.text().trim().split(" ");
+
+        return WindChillDto.builder()
+                .wcAt6((int) tempToWc(Double.parseDouble(temp[2]), Double.parseDouble(velocity[2])))
+                .wcAt9((int) tempToWc(Double.parseDouble(temp[3]), Double.parseDouble(velocity[3])))
+                .wcAt12((int) tempToWc(Double.parseDouble(temp[4]), Double.parseDouble(velocity[4])))
+                .wcAt15((int) tempToWc(Double.parseDouble(temp[5]), Double.parseDouble(velocity[5])))
+                .wcAt18((int) tempToWc(Double.parseDouble(temp[6]), Double.parseDouble(velocity[6])))
+                .wcAt21((int) tempToWc(Double.parseDouble(temp[7]), Double.parseDouble(velocity[7])))
+                .wcAt24((int) tempToWc(Double.parseDouble(temp[8]), Double.parseDouble(velocity[8])))
+                .build();
+    }
+
+    private WindChillDto getPastWindChill(String outfitDate, String outfitLocation) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(outfitDate.substring(0, 10), formatter);
+        LocalDate nextDay = date.plusDays(1);
+        String uri = UriComponentsBuilder
+                .fromUriString("https://apihub.kma.go.kr")
+                .path("/api/typ01/url/kma_sfctm3.php")
+                .queryParam("tm1", date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0600")
+                .queryParam("tm2", nextDay.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000")
+                .queryParam("stn", jijumIdMap.get(outfitLocation))
+                .queryParam("authKey", authKey)
+                .toUriString();
+        String response = new RestTemplate().getForEntity(uri, String.class).getBody();
+        String[] weathers = response.split("\n");
+
+        return WindChillDto.builder()
+                .wcAt6((int) tempToWc(Double.parseDouble(weathers[4].split("\\s+")[11]),
+                        Double.parseDouble(weathers[4].split("\\s+")[3])))
+                .wcAt9((int) tempToWc(Double.parseDouble(weathers[7].split("\\s+")[11]),
+                        Double.parseDouble(weathers[7].split("\\s+")[3])))
+                .wcAt12((int) tempToWc(Double.parseDouble(weathers[10].split("\\s+")[11]),
+                        Double.parseDouble(weathers[10].split("\\s+")[3])))
+                .wcAt15((int) tempToWc(Double.parseDouble(weathers[13].split("\\s+")[11]),
+                        Double.parseDouble(weathers[13].split("\\s+")[3])))
+                .wcAt18((int) tempToWc(Double.parseDouble(weathers[16].split("\\s+")[11]),
+                        Double.parseDouble(weathers[16].split("\\s+")[3])))
+                .wcAt21((int) tempToWc(Double.parseDouble(weathers[19].split("\\s+")[11]),
+                        Double.parseDouble(weathers[19].split("\\s+")[3])))
+                .wcAt24((int) tempToWc(Double.parseDouble(weathers[22].split("\\s+")[11]),
+                        Double.parseDouble(weathers[22].split("\\s+")[3])))
+                .build();
     }
 
     /**

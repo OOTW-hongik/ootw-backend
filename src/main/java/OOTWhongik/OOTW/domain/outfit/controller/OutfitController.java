@@ -43,7 +43,7 @@ public class OutfitController {
 
     @Operation(summary = "outfit creation", description = "착장 생성")
     @PostMapping
-    public ResponseEntity<?> saveOutfit(@RequestBody OutfitRequest outfitRequest) {
+    public ResponseEntity<?> saveOutfit(@RequestBody OutfitRequest outfitRequest) throws IOException {
         outfitService.saveOutfit(outfitRequest);
         return ResponseEntity.ok().build();
     }

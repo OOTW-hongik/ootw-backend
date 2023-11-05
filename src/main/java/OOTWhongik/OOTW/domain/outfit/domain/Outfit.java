@@ -20,9 +20,16 @@ public class Outfit extends BaseTimeEntity {
     @Column(name = "outfit_id")
     private Long id;
 
-//    private LocalDateTime outfitDate;
     private String outfitDate;
     private String outfitLocation; // TODO: change String to enum
+
+    private int wcAt6;
+    private int wcAt9;
+    private int wcAt12;
+    private int wcAt15;
+    private int wcAt18;
+    private int wcAt21;
+    private int wcAt24;
 
     private int highWc;
     private int lowWc;
@@ -46,8 +53,5 @@ public class Outfit extends BaseTimeEntity {
 
     public void addClothesOutfit (ClothesOutfit clothesOutfit) {
         clothesOutfitList.add(clothesOutfit);
-    }
-    public void deleteClothesOutfit (ClothesOutfit clothesOutfit) {
-        clothesOutfitList.remove(clothesOutfit);
     }
 }
