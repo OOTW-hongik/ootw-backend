@@ -28,9 +28,8 @@ public class HomeService {
     public HomeResponse getHome() throws IOException {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId).get();
-        WeatherSummary weatherSummary = weatherUtil.getTodayWeather(member.getLocation());
+        WeatherSummary weatherSummary = weatherUtil.getTodayWeatherSummary(member.getLocation());
         List<WeatherGraphInfo> weatherGraphInfoList = weatherUtil.getWeatherGraphInfo(member.getLocation());
-//        List<OutfitSummary> outfitSummaryList =  outfitService.getOutfitSummaryList(member).subList(0, 3);
         List<OutfitSummary> outfitSummaryList = outfitService.getOutfitSummaryList(member);
         if (outfitSummaryList.size() > 3) outfitSummaryList = outfitSummaryList.subList(0, 3);
         return HomeResponse.builder()

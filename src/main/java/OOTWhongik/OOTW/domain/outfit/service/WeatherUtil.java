@@ -33,20 +33,20 @@ public class WeatherUtil {
         return 13.12 + 0.6215 * temp - 11.37 * Math.pow(velocity, 0.16) + 0.3965 * Math.pow(velocity, 0.16) * temp;
     }
     
-    public WeatherSummary getWeatherInfo(String outfitDate, String outfitLocation) throws IOException {
+    public WeatherSummary getWeatherSummary(String outfitDate, String outfitLocation) throws IOException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formatedNow = LocalDate.now().format(formatter);
         System.out.println("formatedNow = " + formatedNow);
         if (formatedNow.equals(outfitDate.substring(0, 10))) {
-            //오늘 날씨이면
-            return getTodayWeather(outfitLocation);
+            //오늘이면
+            return getTodayWeatherSummary(outfitLocation);
         } else {
-            //과거 날씨이면
-            return getPastWeather(outfitDate, outfitLocation);
+            //과거이면
+            return getPastWeatherSummary(outfitDate, outfitLocation);
         }
     }
 
-    public WeatherSummary getPastWeather(String outfitDate, String outfitLocation) throws IOException {
+    public WeatherSummary getPastWeatherSummary(String outfitDate, String outfitLocation) throws IOException {
         String jijum_id = jijumIdMap.get(outfitLocation);
         String date = outfitDate.substring(0, 10);
         double highTemp;
@@ -83,7 +83,7 @@ public class WeatherUtil {
                 .build();
     }
 
-    public WeatherSummary getTodayWeather(String outfitLocation) throws IOException {
+    public WeatherSummary getTodayWeatherSummary(String outfitLocation) throws IOException {
         String rid = ridMap.get(outfitLocation);
         int highTemp;
         int lowTemp;

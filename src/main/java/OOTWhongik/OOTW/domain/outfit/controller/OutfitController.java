@@ -38,7 +38,7 @@ public class OutfitController {
     @GetMapping("/register")
     public WeatherSummary outfitRegister(@RequestParam String outfitDate,
                                          @RequestParam String outfitLocation) throws IOException {
-        return weatherUtil.getWeatherInfo(outfitDate, outfitLocation);
+        return weatherUtil.getWeatherSummary(outfitDate, outfitLocation);
     }
 
     @Operation(summary = "outfit creation", description = "착장 생성")
