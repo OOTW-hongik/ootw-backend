@@ -34,7 +34,6 @@ public class WeatherUtil {
     }
     
     public WeatherSummary getWeatherInfo(String outfitDate, String outfitLocation) throws IOException {
-//        if (Integer.parseInt(outfitDate.substring(0, 4)) < 1973) throw new Exception();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formatedNow = LocalDate.now().format(formatter);
         System.out.println("formatedNow = " + formatedNow);
@@ -140,7 +139,6 @@ public class WeatherUtil {
             weatherGraphInfoList.add(WeatherGraphInfo.builder()
                             .time(i * 3)
                             .temp(Integer.parseInt(temp[i]))
-                            .skyCondition(0)
                             .build());
         }
         return weatherGraphInfoList;

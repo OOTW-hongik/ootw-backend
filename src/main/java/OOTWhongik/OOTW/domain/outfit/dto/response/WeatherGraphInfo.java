@@ -7,12 +7,10 @@ import lombok.Getter;
 public class WeatherGraphInfo {
     private final int time;
     private final int temp;
-    private final int skyCondition;
 
     @Builder
-    public WeatherGraphInfo(int time, int temp, int skyCondition) {
+    public WeatherGraphInfo(int time, int temp) {
         this.time = time;
         this.temp = temp;
-        this.skyCondition = skyCondition;
     }
 }
