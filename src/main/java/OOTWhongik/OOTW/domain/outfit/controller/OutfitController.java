@@ -5,7 +5,7 @@ import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitDetailResponse;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitListResponse;
 import OOTWhongik.OOTW.domain.outfit.dto.request.OutfitRequest;
 import OOTWhongik.OOTW.domain.outfit.service.OutfitService;
-import OOTWhongik.OOTW.domain.outfit.service.WeatherService;
+import OOTWhongik.OOTW.domain.outfit.service.WeatherUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.io.IOException;
 @RequestMapping("/outfit")
 public class OutfitController {
     private final OutfitService outfitService;
-    private final WeatherService weatherService;
+    private final WeatherUtil weatherUtil;
 
     @Operation(summary = "outfit list", description = "착장 리스트 조회")
     @GetMapping("/list")
@@ -38,7 +38,7 @@ public class OutfitController {
     @GetMapping("/register")
     public WeatherSummary outfitRegister(@RequestParam String outfitDate,
                                          @RequestParam String outfitLocation) throws IOException {
-        return weatherService.getWeatherInfo(outfitDate, outfitLocation);
+        return weatherUtil.getWeatherInfo(outfitDate, outfitLocation);
     }
 
     @Operation(summary = "outfit creation", description = "착장 생성")

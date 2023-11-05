@@ -8,7 +8,7 @@ import OOTWhongik.OOTW.domain.member.dto.response.HomeResponse;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitSummary;
 import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
 import OOTWhongik.OOTW.domain.outfit.service.OutfitService;
-import OOTWhongik.OOTW.domain.outfit.service.WeatherService;
+import OOTWhongik.OOTW.domain.outfit.service.WeatherUtil;
 import OOTWhongik.OOTW.global.config.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,14 +22,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HomeService {
     private final OutfitService outfitService;
-    private final WeatherService weatherService;
+    private final WeatherUtil weatherUtil;
     private final MemberRepository memberRepository;
 
     public HomeResponse getHome() throws IOException {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId).get();
-        WeatherSummary weatherSummary = weatherService.getTodayWeather(member.getLocation());
-        List<WeatherGraphInfo> weatherGraphInfoList = weatherService.getWeatherGraphInfo(member.getLocation());
+        WeatherSummary weatherSummary = weatherUtil.getTodayWeather(member.getLocation());
+        List<WeatherGraphInfo> weatherGraphInfoList = weatherUtil.getWeatherGraphInfo(member.getLocation());
 //        List<OutfitSummary> outfitSummaryList =  outfitService.getOutfitSummaryList(member).subList(0, 3);
         List<OutfitSummary> outfitSummaryList = outfitService.getOutfitSummaryList(member);
         if (outfitSummaryList.size() > 3) outfitSummaryList = outfitSummaryList.subList(0, 3);

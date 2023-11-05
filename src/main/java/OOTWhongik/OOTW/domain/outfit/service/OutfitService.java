@@ -31,7 +31,7 @@ public class OutfitService {
     private final MemberRepository memberRepository;
     private final ClothesRepository clothesRepository;
     private final ClothesOutfitRepository clothesOutfitRepository;
-    private final WeatherService weatherService;
+    private final WeatherUtil weatherUtil;
 
 
     @Transactional
@@ -157,7 +157,7 @@ public class OutfitService {
                     .build();
             outfitSummaryList.add(outfitSummary);
         }
-        WeatherSummary todayWeather = weatherService.getTodayWeather(member.getLocation());
+        WeatherSummary todayWeather = weatherUtil.getTodayWeather(member.getLocation());
         outfitSummaryList.sort(((o1, o2) -> weatherDiff(o1, todayWeather) - weatherDiff(o2, todayWeather)));
         return outfitSummaryList;
     }

@@ -8,8 +8,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -17,10 +16,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@Service
-@Transactional(readOnly = true)
+@Component
 @RequiredArgsConstructor
-public class WeatherService {
+public class WeatherUtil {
 
     private final HttpConn httpConn;
 
@@ -31,7 +29,7 @@ public class WeatherService {
     private String todayUrl;
 
 
-    public static double calcWc (double temp, double velocity) {
+    public static double tempToWc (double temp, double velocity) {
         return 13.12 + 0.6215 * temp - 11.37 * Math.pow(velocity, 0.16) + 0.3965 * Math.pow(velocity, 0.16) * temp;
     }
     
@@ -69,8 +67,8 @@ public class WeatherService {
         highTemp = Double.parseDouble(elements.get(7).text());
         lowTemp = Double.parseDouble(elements.get(9).text());
         double velocity = Double.parseDouble(elements.get(15).text());
-        highWc = (int)Math.round(WeatherService.calcWc(highTemp, velocity));
-        lowWc = (int)Math.round(WeatherService.calcWc(lowTemp, velocity));
+        highWc = (int)Math.round(WeatherUtil.tempToWc(highTemp, velocity));
+        lowWc = (int)Math.round(WeatherUtil.tempToWc(lowTemp, velocity));
         element = httpResponse.select("font").select("[color=#27385A]").get(9);
         String[] weathers = element.text().split("/");
         for (String weather : weathers) {
@@ -107,8 +105,8 @@ public class WeatherService {
         element = httpResponse.select("td").select("[color=\"7f7f7f\"]").first();
         String[] velocityList = element.text().split(" ");
         int velocity = Integer.parseInt(velocityList[0].trim());
-        highWc = (int)Math.round(WeatherService.calcWc(highTemp, velocity));
-        lowWc = (int)Math.round(WeatherService.calcWc(lowTemp, velocity));
+        highWc = (int)Math.round(WeatherUtil.tempToWc(highTemp, velocity));
+        lowWc = (int)Math.round(WeatherUtil.tempToWc(lowTemp, velocity));
         //skyCondition 파악
         element = httpResponse.select("td").select("[width=\"50%\"]").get(1);
         String html = element.html();
