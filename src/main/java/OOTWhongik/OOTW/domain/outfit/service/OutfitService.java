@@ -16,6 +16,7 @@ import OOTWhongik.OOTW.domain.outfit.repository.OutfitRepository;
 import OOTWhongik.OOTW.global.config.security.SecurityUtil;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,9 @@ public class OutfitService {
     private final ClothesOutfitRepository clothesOutfitRepository;
     private final WeatherUtil weatherUtil;
 
+
+    @Value("${weather.weight}")
+    private double ratingWeight;
 
     @Transactional
     public void saveOutfit(OutfitRequest outfitRequest) {
@@ -158,19 +162,24 @@ public class OutfitService {
             outfitSummaryList.add(outfitSummary);
         }
         WeatherSummary todayWeather = weatherUtil.getTodayWeather(member.getLocation());
-        outfitSummaryList.sort(((o1, o2) -> weatherDiff(o1, todayWeather) - weatherDiff(o2, todayWeather)));
+        outfitSummaryList.sort(((o1, o2) -> (int) (calcDissimilarity(o1, todayWeather) - calcDissimilarity(o2, todayWeather))));
         return outfitSummaryList;
     }
 
-    private int weatherDiff(OutfitSummary outfitSummary, WeatherSummary todayWeather) {
+    private double calcDissimilarity(OutfitSummary outfitSummary, WeatherSummary todayWeather) {
         int highWcDiff = outfitSummary.getHighWc() - todayWeather.getHighWc();
         int lowWcDiff = outfitSummary.getLowWc() - todayWeather.getLowWc();
         int highTempDiff = outfitSummary.getHighTemp() - todayWeather.getHighTemp();
         int lowTempDiff = outfitSummary.getLowTemp() - todayWeather.getLowTemp();
-        return highWcDiff * highWcDiff +
+        int tempDissimilarity = highWcDiff * highWcDiff +
                 lowWcDiff * lowWcDiff +
                 highTempDiff * lowTempDiff +
                 lowTempDiff * lowTempDiff;
+        double ratingDissimilarity = ratingWeight *
+                ((outfitSummary.getOuterRating() - 3) * (outfitSummary.getOuterRating() - 3)
+                + (outfitSummary.getTopRating() - 3) * (outfitSummary.getTopRating() - 3)
+                + (outfitSummary.getBottomRating() - 3) * (outfitSummary.getBottomRating() - 3));
+        return tempDissimilarity + ratingDissimilarity;
     }
 
     public OutfitListResponse getOutfitList() throws IOException {
