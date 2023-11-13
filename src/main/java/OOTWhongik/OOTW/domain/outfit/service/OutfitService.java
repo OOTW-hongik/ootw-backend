@@ -131,7 +131,7 @@ public class OutfitService {
         List<Outfit> outfitList = member.getOutfitList();
         WindChillDto todayWindChill = weatherUtil.getTodayWindChill(member.getLocation());
         outfitList.sort(
-                ((o1, o2) -> (int) (calcDissimilarity(o1, todayWindChill) - calcDissimilarity(o2, todayWindChill))));
+                ((o1, o2) -> (int) (calcIndicator(o1, todayWindChill) - calcIndicator(o2, todayWindChill))));
         List<OutfitSummary> outfitSummaryList = new ArrayList<>();
         for (Outfit outfit : outfitList) {
             int cntOuter = 0;
@@ -177,7 +177,7 @@ public class OutfitService {
         return outfitSummaryList;
     }
 
-    private double calcDissimilarity(Outfit outfit, WindChillDto todayWindChill) {
+    private double calcIndicator(Outfit outfit, WindChillDto todayWindChill) {
         int[] windChillDiff = {
                 outfit.getWcAt6() - todayWindChill.getWcAt6(),
                 outfit.getWcAt9() - todayWindChill.getWcAt9(),
@@ -187,12 +187,12 @@ public class OutfitService {
                 outfit.getWcAt21() - todayWindChill.getWcAt21(),
                 outfit.getWcAt24() - todayWindChill.getWcAt24()
         };
-        int tempDissimilarity = Arrays.stream(windChillDiff).map(wc -> wc * wc).sum();
-        double ratingDissimilarity = ratingWeight *
+        int weatherDissimilarity = Arrays.stream(windChillDiff).map(wc -> wc * wc).sum();
+        double ratingDeviation = ratingWeight *
                 ((outfit.getOuterRating() - 3) * (outfit.getOuterRating() - 3)
                         + (outfit.getTopRating() - 3) * (outfit.getTopRating() - 3)
                         + (outfit.getBottomRating() - 3) * (outfit.getBottomRating() - 3));
-        return tempDissimilarity + ratingDissimilarity;
+        return weatherDissimilarity + ratingDeviation;
     }
 
     public OutfitListResponse getOutfitList() throws IOException {
