@@ -132,9 +132,11 @@ public class OutfitService {
         List<Outfit> outfitList = member.getOutfitList();
         WindChillDto todayWindChill = weatherUtil.getTodayWindChill(member.getLocation());
         outfitList.sort(Comparator.comparingInt(o -> calculateWeatherDissimilarity(o, todayWindChill)));
-        if (quantity.isPresent() && quantity.get() < outfitList.size()) {
-            outfitList = outfitList.subList(0, quantity.get());
-        } else if (outfitList.size() > 10){
+        if (quantity.isPresent()) {
+            if (quantity.get() < outfitList.size()) {
+                outfitList = outfitList.subList(0, quantity.get());
+            }
+        } else if (outfitList.size() > 10) {
             outfitList = outfitList.subList(0, 10);
         }
         outfitList.sort(Comparator.comparingInt(o -> calculateIndicator(o, todayWindChill)));
