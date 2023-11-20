@@ -16,6 +16,7 @@ import OOTWhongik.OOTW.domain.outfit.repository.OutfitRepository;
 import OOTWhongik.OOTW.global.config.security.SecurityUtil;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -130,8 +131,7 @@ public class OutfitService {
     public List<OutfitSummary> getOutfitSummaryList(Member member) throws IOException {
         List<Outfit> outfitList = member.getOutfitList();
         WindChillDto todayWindChill = weatherUtil.getTodayWindChill(member.getLocation());
-        outfitList.sort(
-                ((o1, o2) -> (int) (calcIndicator(o1, todayWindChill) - calcIndicator(o2, todayWindChill))));
+        outfitList.sort(Comparator.comparingInt(o -> calculateIndicator(o, todayWindChill)));
         List<OutfitSummary> outfitSummaryList = new ArrayList<>();
         for (Outfit outfit : outfitList) {
             int cntOuter = 0;
@@ -177,7 +177,13 @@ public class OutfitService {
         return outfitSummaryList;
     }
 
-    private double calcIndicator(Outfit outfit, WindChillDto todayWindChill) {
+    private int calculateIndicator(Outfit outfit, WindChillDto todayWindChill) {
+        int weatherDissimilarity = calculateWeatherDissimilarity(outfit, todayWindChill);
+        double ratingDeviation = calculateRatingDeviation(outfit);
+        return (int) (weatherDissimilarity + ratingDeviation);
+    }
+
+    private static int calculateWeatherDissimilarity(Outfit outfit, WindChillDto todayWindChill) {
         int[] windChillDiff = {
                 outfit.getWcAt6() - todayWindChill.getWcAt6(),
                 outfit.getWcAt9() - todayWindChill.getWcAt9(),
@@ -187,8 +193,11 @@ public class OutfitService {
                 outfit.getWcAt21() - todayWindChill.getWcAt21(),
                 outfit.getWcAt24() - todayWindChill.getWcAt24()
         };
-        int weatherDissimilarity = Arrays.stream(windChillDiff).map(wc -> wc * wc).sum();
-        double ratingDeviation = ratingWeight *
+        return Arrays.stream(windChillDiff).map(wc -> wc * wc).sum();
+    }
+
+    private double calculateRatingDeviation(Outfit outfit) {
+        return ratingWeight *
                 ((outfit.getOuterRating() - 3) * (outfit.getOuterRating() - 3)
                         + (outfit.getTopRating() - 3) * (outfit.getTopRating() - 3)
                         + (outfit.getBottomRating() - 3) * (outfit.getBottomRating() - 3));
