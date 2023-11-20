@@ -8,6 +8,7 @@ import OOTWhongik.OOTW.domain.outfit.service.OutfitService;
 import OOTWhongik.OOTW.domain.outfit.service.WeatherUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,8 @@ public class OutfitController {
 
     @Operation(summary = "outfit list", description = "착장 리스트 조회")
     @GetMapping("/list")
-    public OutfitListResponse getOutfitList () throws IOException {
-        return outfitService.getOutfitList();
+    public OutfitListResponse getOutfitList (@RequestParam(required = false) Optional<Integer> quantity) throws IOException {
+        return outfitService.getOutfitList(quantity);
     }
 
     @Operation(summary = "outfit detail", description = "착장 상세 페이지")

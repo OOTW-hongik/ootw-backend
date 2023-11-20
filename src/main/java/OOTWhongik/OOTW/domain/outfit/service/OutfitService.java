@@ -128,9 +128,15 @@ public class OutfitService {
         outfitRepository.save(outfit);
     }
 
-    public List<OutfitSummary> getOutfitSummaryList(Member member) throws IOException {
+    public List<OutfitSummary> getOutfitSummaryList(Member member, Optional<Integer> quantity) throws IOException {
         List<Outfit> outfitList = member.getOutfitList();
         WindChillDto todayWindChill = weatherUtil.getTodayWindChill(member.getLocation());
+        outfitList.sort(Comparator.comparingInt(o -> calculateWeatherDissimilarity(o, todayWindChill)));
+        if (quantity.isPresent() && quantity.get() < outfitList.size()) {
+            outfitList = outfitList.subList(0, quantity.get());
+        } else if (outfitList.size() > 10){
+            outfitList = outfitList.subList(0, 10);
+        }
         outfitList.sort(Comparator.comparingInt(o -> calculateIndicator(o, todayWindChill)));
         List<OutfitSummary> outfitSummaryList = new ArrayList<>();
         for (Outfit outfit : outfitList) {
@@ -201,14 +207,13 @@ public class OutfitService {
                 ((outfit.getOuterRating() - 3) * (outfit.getOuterRating() - 3)
                         + (outfit.getTopRating() - 3) * (outfit.getTopRating() - 3)
                         + (outfit.getBottomRating() - 3) * (outfit.getBottomRating() - 3));
-        return weatherDissimilarity + ratingDeviation;
     }
 
-    public OutfitListResponse getOutfitList() throws IOException {
+    public OutfitListResponse getOutfitList(Optional<Integer> quantity) throws IOException {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId).get();
         String name = member.getName();
-        List<OutfitSummary> outfitSummaryList = getOutfitSummaryList(member);
+        List<OutfitSummary> outfitSummaryList = getOutfitSummaryList(member, quantity);
         return new OutfitListResponse(name, outfitSummaryList);
     }
 

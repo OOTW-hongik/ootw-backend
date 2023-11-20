@@ -10,6 +10,7 @@ import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
 import OOTWhongik.OOTW.domain.outfit.service.OutfitService;
 import OOTWhongik.OOTW.domain.outfit.service.WeatherUtil;
 import OOTWhongik.OOTW.global.config.security.SecurityUtil;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ public class HomeService {
         Member member = memberRepository.findById(memberId).get();
         WeatherSummary weatherSummary = weatherUtil.getTodayWeatherSummary(member.getLocation());
         List<WeatherGraphInfo> weatherGraphInfoList = weatherUtil.getWeatherGraphInfo(member.getLocation());
-        List<OutfitSummary> outfitSummaryList = outfitService.getOutfitSummaryList(member);
+        List<OutfitSummary> outfitSummaryList = outfitService.getOutfitSummaryList(member, Optional.of(3));
         if (outfitSummaryList.size() > 3) outfitSummaryList = outfitSummaryList.subList(0, 3);
         return HomeResponse.builder()
                 .name(member.getName())
