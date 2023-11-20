@@ -214,7 +214,8 @@ public class OutfitService {
         Member member = memberRepository.findById(memberId).get();
         String name = member.getName();
         List<OutfitSummary> outfitSummaryList = getOutfitSummaryList(member, quantity);
-        return new OutfitListResponse(name, outfitSummaryList);
+        boolean isEnd = member.getOutfitList().size() == outfitSummaryList.size();
+        return new OutfitListResponse(name, isEnd, outfitSummaryList);
     }
 
     public OutfitDetailResponse getOutfitDetail(Long outfitId) throws Exception {
