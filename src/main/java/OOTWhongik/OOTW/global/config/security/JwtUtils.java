@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
+import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
 @Component
@@ -54,22 +55,17 @@ public class JwtUtils {
                 .compact();
     }
 
-//    public boolean validateToken(String token) {
-//        if (!StringUtils.hasText(token)) {
-//            throw new AppException(ErrorCode.JWT_TOKEN_NOT_EXISTS);
-//        }
-//        if(isLogout(token)){
-//            throw new AppException(ErrorCode.JWT_TOKEN_EXPIRED);
-//        }
-//        try {
-//            Claims claims = Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(token).getBody();
-//            return true;
-//        } catch (SignatureException | MalformedJwtException e) {
-//            throw new AppException(ErrorCode.WRONG_JWT_TOKEN);
-//        } catch (ExpiredJwtException e) {
-//            throw new AppException(ErrorCode.JWT_TOKEN_EXPIRED);
-//        }
-//    }
+    public static boolean validateToken(String token) {
+        if (!StringUtils.hasText(token)) {
+            return false;
+        }
+        try {
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+            return true;
+        } catch (SignatureException | MalformedJwtException | ExpiredJwtException ex) {
+            return false;
+        }
+    }
 
     public static Long getExpiration(String token) {
         Date expiration = getClaims(token).getExpiration();
