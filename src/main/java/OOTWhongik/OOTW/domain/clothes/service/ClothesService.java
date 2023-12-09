@@ -3,6 +3,10 @@ package OOTWhongik.OOTW.domain.clothes.service;
 import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
 import OOTWhongik.OOTW.domain.clothes.domain.Photo;
 import OOTWhongik.OOTW.domain.clothes.dto.request.ClothesRequest;
+import OOTWhongik.OOTW.domain.clothes.dto.response.ClothesResponse;
+import OOTWhongik.OOTW.domain.clothes.exception.ClothesInUseException;
+import OOTWhongik.OOTW.domain.clothes.exception.ClothesNotFoundException;
+import OOTWhongik.OOTW.domain.clothes.exception.UnauthorizedClothesAccessException;
 import OOTWhongik.OOTW.domain.clothes.repository.ClothesRepository;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
@@ -11,9 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-
 
 @Service
 @Transactional(readOnly = true)
@@ -37,9 +38,10 @@ public class ClothesService {
     @Transactional
     public ClothesResponse updateClothes(Long clothesId, ClothesRequest clothesRequest, MultipartFile file) throws Exception {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
-        Clothes clothes = clothesRepository.findById(clothesId).get();
-        if (!isOwner(member, clothes)) {
-            throw new Exception("옷의 소유주가 아닙니다.");
+        Clothes clothes = clothesRepository.findById(clothesId)
+                .orElseThrow(() -> new ClothesNotFoundException("id가 " + clothesId + "인 옷을 찾지 못했습니다."));
+        if (!member.contains(clothes)) {
+            throw new UnauthorizedClothesAccessException("해당 유저는 id가" + clothesId + "인 옷을 소유하고 있지 않습니다.");
         }
         clothes.update(clothesRequest);
         Photo photo = photoService.updatePhoto(file, clothes.getId(), clothes.getPhoto().getId());
@@ -51,28 +53,26 @@ public class ClothesService {
     @Transactional
     public ClothesResponse updateClothes(Long clothesId, ClothesRequest clothesRequest) {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
-        Clothes clothes = clothesRepository.findById(clothesId).get();
-        if (!isOwner(member, clothes)) {
-            throw new Exception("옷의 소유주가 아닙니다.");
+        Clothes clothes = clothesRepository.findById(clothesId)
+                .orElseThrow(() -> new ClothesNotFoundException("id가 " + clothesId + "인 옷을 찾지 못했습니다."));
+        if (!member.contains(clothes)) {
+            throw new UnauthorizedClothesAccessException("해당 유저는 id가" + clothesId + "인 옷을 소유하고 있지 않습니다.");
         }
         clothes.update(clothesRequest);
         return ClothesResponse.from(clothes);
     }
 
     @Transactional
-    public void deleteClothes(Long clothesId) throws Exception {
+    public void deleteClothes(Long clothesId) {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
-        Clothes clothes = clothesRepository.findById(clothesId).get();
-        if (!isOwner(member, clothes)) {
-            throw new Exception("옷의 소유주가 아닙니다.");
+        Clothes clothes = clothesRepository.findById(clothesId)
+                .orElseThrow(() -> new ClothesNotFoundException("id가 " + clothesId + "인 옷을 찾지 못했습니다."));
+        if (!member.contains(clothes)) {
+            throw new UnauthorizedClothesAccessException("해당 유저는 id가" + clothesId + "인 옷을 소유하고 있지 않습니다.");
         }
         if (clothes.getClothesOutfitList().size() > 0)
-            throw new Exception("옷이 쓰인 착장이 없어야 삭제가 가능합니다.");
+            throw new ClothesInUseException("옷이 쓰이고 있는 착장이 있습니다.");
         photoService.deletePhoto(clothes.getPhoto());
         clothesRepository.delete(clothes);
-    }
-
-    private boolean isOwner(Member member, Clothes clothes) {
-        return clothes.getMember() == member;
     }
 }

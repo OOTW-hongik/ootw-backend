@@ -1,6 +1,9 @@
 package OOTWhongik.OOTW.domain.clothes.service;
 
+import OOTWhongik.OOTW.domain.clothes.domain.Category;
 import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
+import OOTWhongik.OOTW.domain.clothes.exception.ClothesNotFoundException;
+import OOTWhongik.OOTW.domain.clothes.exception.UnauthorizedClothesAccessException;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.domain.clothes.dto.response.ClosetResponse;
 import OOTWhongik.OOTW.domain.clothes.dto.response.ClothesDetailResponse;
@@ -25,42 +28,43 @@ public class ClosetService {
     private final ClothesRepository clothesRepository;
     private final MemberRepository memberRepository;
 
-    public ClosetResponse getCloset(String category) {
-        return getCloset(category, false);
+    public ClosetResponse getCloset(String categoryName) {
+        return getCloset(categoryName, false);
     }
 
-    public ClosetResponse getHiddenCloset(String category) {
-        return getCloset(category, true);
+    public ClosetResponse getHiddenCloset(String categoryName) {
+        return getCloset(categoryName, true);
     }
 
-    public ClosetResponse getCloset(String category, boolean hidden) {
+    public ClosetResponse getCloset(String categoryName, boolean hidden) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId).get();
-        List<Clothes> clothesList;
-        if (clothesRepository.findAllByMemberAndCategory(member, category).isPresent()) {
-            clothesList = clothesRepository.findAllByMemberAndCategory(member, category).get();
-        } else {
-            throw new RuntimeException("등록된 옷이 없습니다.");
-        }
+        List<Clothes> clothesList =
+                clothesRepository.findAllByMemberAndCategory(member, Category.findByName(categoryName));
+
         Set<String> subCategoryCollection = new TreeSet<>();
-        List<ClothesResponse> clothesResponseParam = new ArrayList<>();
-        for (Clothes clothes : clothesList) {
-            if (clothes.isHidden() != hidden) continue;
+        List<ClothesResponse> clothesResponses = new ArrayList<>();
+        clothesList.stream()
+                .filter(clothes -> clothes.isHidden() == hidden)
+                .forEachOrdered(clothes -> {
+                    subCategoryCollection.add(clothes.getSubcategory());
+                    clothesResponses.add(ClothesResponse.from(clothes));
+                });
 
-            subCategoryCollection.add(clothes.getSubcategory());
-            //clothes 를 삽입
-            clothesResponseParam.add(ClothesResponse.builder()
-                            .clothesId(clothes.getId())
-                            .clothesUrl(clothes.getPhoto().getStoredFilePath())
-                            .subCategory(clothes.getSubcategory())
-                            .build());
-        }
-
-        return new ClosetResponse(new ArrayList<>(subCategoryCollection), clothesResponseParam);
+        return ClosetResponse.builder()
+                .subCategoryName(new ArrayList<>(subCategoryCollection))
+                .clothesList(clothesResponses)
+                .build();
     }
 
     public ClothesDetailResponse getClothes(Long clothesId) {
-        Clothes clothes = clothesRepository.findById(clothesId).get();
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.findById(memberId).get();
+        Clothes clothes = clothesRepository.findById(clothesId)
+                .orElseThrow(() -> new ClothesNotFoundException("id가 " + clothesId + "인 옷을 찾지 못했습니다."));
+        if (!member.contains(clothes)) {
+            throw new UnauthorizedClothesAccessException("해당 유저는 id가" + clothesId + "인 옷을 소유하고 있지 않습니다.");
+        }
         return ClothesDetailResponse.builder()
                 .clothesId(clothesId)
                 .clothesUrl(clothes.getPhoto().getStoredFilePath())

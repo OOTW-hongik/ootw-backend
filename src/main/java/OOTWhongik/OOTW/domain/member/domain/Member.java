@@ -3,11 +3,9 @@ package OOTWhongik.OOTW.domain.member.domain;
 import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
 import OOTWhongik.OOTW.domain.outfit.domain.Outfit;
 import OOTWhongik.OOTW.global.common.BaseTimeEntity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -50,5 +48,9 @@ public class Member extends BaseTimeEntity {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public boolean contains(Clothes clothes) {
+        return this.clothesList.contains(clothes);
     }
 }

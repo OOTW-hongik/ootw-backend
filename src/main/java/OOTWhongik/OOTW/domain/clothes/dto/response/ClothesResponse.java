@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.domain.clothes.dto.response;
 
+import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,4 +12,12 @@ public class ClothesResponse {
     private final Long clothesId;
     private final String clothesUrl;
     private final String subCategory;
+
+    public static ClothesResponse from(Clothes clothes) {
+        return ClothesResponse.builder()
+                .clothesId(clothes.getId())
+                .clothesUrl(clothes.getPhoto().getStoredFilePath())
+                .subCategory(clothes.getSubcategory())
+                .build();
+    }
 }
