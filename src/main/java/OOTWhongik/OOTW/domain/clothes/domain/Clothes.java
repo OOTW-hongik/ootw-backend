@@ -3,7 +3,6 @@ package OOTWhongik.OOTW.domain.clothes.domain;
 import OOTWhongik.OOTW.domain.clothes.dto.request.ClothesRequest;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.global.common.BaseTimeEntity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +22,8 @@ public class Clothes extends BaseTimeEntity {
     @Column(name = "clothes_id")
     private Long id;
 
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     private String subcategory;
 
@@ -35,7 +35,6 @@ public class Clothes extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @JsonBackReference
     @OneToMany(mappedBy = "clothes")
     private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
 
