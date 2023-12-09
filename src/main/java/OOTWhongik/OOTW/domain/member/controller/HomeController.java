@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-
 @Tag(name = "home", description = "home")
 @RequestMapping("/home")
 @RequiredArgsConstructor
@@ -20,7 +18,7 @@ public class HomeController {
 
     @Operation(summary = "home", description = "home")
     @GetMapping
-    public HomeResponse home() throws IOException {
+    public HomeResponse home() {
         return homeService.getHome();
     }
 

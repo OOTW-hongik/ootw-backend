@@ -14,9 +14,10 @@ import OOTWhongik.OOTW.domain.clothes.repository.ClothesRepository;
 import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
 import OOTWhongik.OOTW.domain.outfit.repository.OutfitRepository;
 import OOTWhongik.OOTW.global.config.security.SecurityUtil;
-import java.io.IOException;
+
 import java.util.Arrays;
 import java.util.Comparator;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class OutfitService {
     private double ratingWeight;
 
     @Transactional
-    public void saveOutfit(OutfitRequest outfitRequest) throws IOException {
+    public void saveOutfit(OutfitRequest outfitRequest) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member owner = memberRepository.findById(memberId).get();
         WindChillDto windChillDto =
@@ -128,9 +129,9 @@ public class OutfitService {
         outfitRepository.save(outfit);
     }
 
-    public List<OutfitSummary> getOutfitSummaryList(Member member, Optional<Integer> quantity) throws IOException {
+    public List<OutfitSummary> getOutfitSummaryList(Member member, Optional<Integer> quantity) {
         List<Outfit> outfitList = member.getOutfitList();
-        WindChillDto todayWindChill = weatherUtil.getTodayWindChill(member.getLocation());
+        WindChillDto todayWindChill = weatherUtil.getTodayWindChill(member.getLocation().getValue());
         outfitList.sort(Comparator.comparingInt(o -> calculateWeatherDissimilarity(o, todayWindChill)));
         if (quantity.isPresent()) {
             if (quantity.get() < outfitList.size()) {
@@ -151,19 +152,19 @@ public class OutfitService {
             for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
                 Clothes clothes = clothesOutfit.getClothes();
                 switch (clothes.getCategory()) {
-                    case "아우터" -> {
+                    case OUTER -> {
                         cntOuter++;
                         if (mainOuter == null) {
                             mainOuter = clothes;
                         }
                     }
-                    case "상의" -> {
+                    case TOP -> {
                         cntTop++;
                         if (mainTop == null) {
                             mainTop = clothes;
                         }
                     }
-                    case "하의" -> {
+                    case BOTTOM -> {
                         cntBottom++;
                         if (mainBottom == null) {
                             mainBottom = clothes;
@@ -211,7 +212,7 @@ public class OutfitService {
                         + (outfit.getBottomRating() - 3) * (outfit.getBottomRating() - 3));
     }
 
-    public OutfitListResponse getOutfitList(Optional<Integer> quantity) throws IOException {
+    public OutfitListResponse getOutfitList(Optional<Integer> quantity) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId).get();
         String name = member.getName();

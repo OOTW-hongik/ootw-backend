@@ -1,6 +1,5 @@
 package OOTWhongik.OOTW.domain.outfit.dto.response;
 
-import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
 import OOTWhongik.OOTW.domain.clothes.domain.ClothesOutfit;
 import OOTWhongik.OOTW.domain.outfit.domain.Outfit;
 import lombok.Builder;
@@ -59,27 +58,20 @@ public class OutfitDetailResponse {
         List<UrlAndId> tops = new ArrayList<>();
         List<UrlAndId> bottoms = new ArrayList<>();
         List<UrlAndId> etcs = new ArrayList<>();
-        for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
-            Clothes clothes = clothesOutfit.getClothes();
-            UrlAndId tmp = UrlAndId.builder()
-                    .clothesUrl(clothes.getPhoto().getStoredFilePath())
-                    .clothesId(clothes.getId())
-                    .build();
-            switch (clothes.getCategory()) {
-                case "아우터":
-                    outers.add(tmp);
-                    break;
-                case "상의":
-                    tops.add(tmp);
-                    break;
-                case "하의":
-                    bottoms.add(tmp);
-                    break;
-                case "기타":
-                    etcs.add(tmp);
-                    break;
-            }
-        }
+        outfit.getClothesOutfitList().stream()
+                .map(ClothesOutfit::getClothes)
+                .forEachOrdered(clothes -> {
+                    UrlAndId tmp = UrlAndId.builder()
+                            .clothesUrl(clothes.getPhoto().getStoredFilePath())
+                            .clothesId(clothes.getId())
+                            .build();
+                    switch (clothes.getCategory()) {
+                        case OUTER -> outers.add(tmp);
+                        case TOP -> tops.add(tmp);
+                        case BOTTOM -> bottoms.add(tmp);
+                        case ETC -> etcs.add(tmp);
+                    }
+                });
         this.outers = outers;
         this.tops = tops;
         this.bottoms = bottoms;

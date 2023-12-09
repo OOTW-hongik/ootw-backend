@@ -1,6 +1,7 @@
 package OOTWhongik.OOTW.domain.clothes.service;
 
 import OOTWhongik.OOTW.domain.clothes.domain.Photo;
+import OOTWhongik.OOTW.domain.clothes.exception.FileUploadException;
 import OOTWhongik.OOTW.domain.clothes.repository.PhotoRepository;
 import OOTWhongik.OOTW.global.common.filecontrol.S3FileComponent;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,13 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
 
     @Transactional
-    public Photo uploadPhoto(MultipartFile file, Long clothesId) throws IOException {
-        List<String> uploadImageUrl = s3FileComponent.upload(file, "ootw", Long.toString(clothesId));
+    public Photo uploadPhoto(MultipartFile file, Long clothesId) {
+        List<String> uploadImageUrl;
+        try {
+            uploadImageUrl = s3FileComponent.upload(file, "ootw", Long.toString(clothesId));
+        } catch (Exception e) {
+            throw new FileUploadException();
+        }
         Photo photo = Photo.builder()
                 .originalFileName(file.getOriginalFilename())
                 .storedFilePath(uploadImageUrl.get(0))

@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -26,16 +25,16 @@ public class HomeService {
     private final WeatherUtil weatherUtil;
     private final MemberRepository memberRepository;
 
-    public HomeResponse getHome() throws IOException {
+    public HomeResponse getHome() {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(memberId).get();
-        WeatherSummary weatherSummary = weatherUtil.getTodayWeatherSummary(member.getLocation());
-        List<WeatherGraphInfo> weatherGraphInfoList = weatherUtil.getWeatherGraphInfo(member.getLocation());
+        WeatherSummary weatherSummary = weatherUtil.getTodayWeatherSummary(member.getLocation().getValue());
+        List<WeatherGraphInfo> weatherGraphInfoList = weatherUtil.getWeatherGraphInfo(member.getLocation().getValue());
         List<OutfitSummary> outfitSummaryList = outfitService.getOutfitSummaryList(member, Optional.of(3));
         if (outfitSummaryList.size() > 3) outfitSummaryList = outfitSummaryList.subList(0, 3);
         return HomeResponse.builder()
                 .name(member.getName())
-                .location(member.getLocation())
+                .location(member.getLocation().getValue())
                 .skyCondition(weatherSummary.getSkyCondition())
                 .highTemp(weatherSummary.getHighTemp())
                 .lowTemp(weatherSummary.getLowTemp())
