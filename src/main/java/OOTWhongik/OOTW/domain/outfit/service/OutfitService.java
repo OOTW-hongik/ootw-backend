@@ -2,6 +2,7 @@ package OOTWhongik.OOTW.domain.outfit.service;
 
 import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
 import OOTWhongik.OOTW.domain.clothes.domain.ClothesOutfit;
+import OOTWhongik.OOTW.domain.clothes.exception.ClothesNotFoundException;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.domain.outfit.domain.Outfit;
 import OOTWhongik.OOTW.domain.outfit.dto.WindChillDto;
@@ -12,6 +13,8 @@ import OOTWhongik.OOTW.domain.outfit.dto.request.OutfitRequest;
 import OOTWhongik.OOTW.domain.clothes.repository.ClothesOutfitRepository;
 import OOTWhongik.OOTW.domain.clothes.repository.ClothesRepository;
 import OOTWhongik.OOTW.domain.member.repository.MemberRepository;
+import OOTWhongik.OOTW.domain.outfit.exception.OutfitNotFoundException;
+import OOTWhongik.OOTW.domain.outfit.exception.UnauthorizedOutfitAccessException;
 import OOTWhongik.OOTW.domain.outfit.repository.OutfitRepository;
 import OOTWhongik.OOTW.global.config.security.SecurityUtil;
 
@@ -23,9 +26,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,95 +41,51 @@ public class OutfitService {
     private final ClothesOutfitRepository clothesOutfitRepository;
     private final WeatherUtil weatherUtil;
 
-
     @Value("${weather.weight}")
     private double ratingWeight;
 
     @Transactional
-    public void saveOutfit(OutfitRequest outfitRequest) {
+    public Long saveOutfit(OutfitRequest outfitRequest) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member owner = memberRepository.findById(memberId).get();
         WindChillDto windChillDto =
                 weatherUtil.getWindChill(outfitRequest.getOutfitDate(), outfitRequest.getOutfitLocation());
-        Outfit outfit = Outfit.builder()
-                .owner(owner)
-                .outfitDate(outfitRequest.getOutfitDate())
-                .outfitLocation(outfitRequest.getOutfitLocation())
-                .highWc(outfitRequest.getHighWc())
-                .lowWc(outfitRequest.getLowWc())
-                .highTemp(outfitRequest.getHighTemp())
-                .lowTemp(outfitRequest.getLowTemp())
-                .outerRating(outfitRequest.getOuterRating())
-                .topRating(outfitRequest.getTopRating())
-                .bottomRating(outfitRequest.getBottomRating())
-                .etcRating(outfitRequest.getEtcRating())
-                .outfitComment(outfitRequest.getOutfitComment())
-                .skyCondition(outfitRequest.getSkyCondition())
-                .clothesOutfitList(new ArrayList<>())
-                .wcAt6(windChillDto.getWcAt6())
-                .wcAt9(windChillDto.getWcAt9())
-                .wcAt12(windChillDto.getWcAt12())
-                .wcAt15(windChillDto.getWcAt15())
-                .wcAt18(windChillDto.getWcAt18())
-                .wcAt21(windChillDto.getWcAt21())
-                .wcAt24(windChillDto.getWcAt24())
-                .build();
-        List<Long> clothesList = new ArrayList<>();
-        clothesList.addAll(outfitRequest.getOuterIdList());
-        clothesList.addAll(outfitRequest.getTopIdList());
-        clothesList.addAll(outfitRequest.getBottomIdList());
-        clothesList.addAll(outfitRequest.getEtcIdList());
-        for (Long clothesId : clothesList) {
-            Clothes clothes = clothesRepository.findById(clothesId).get();
-            ClothesOutfit clothesOutfit = ClothesOutfit.builder()
-                    .clothes(clothes)
-                    .outfit(outfit)
-                    .build();
-            outfit.addClothesOutfit(clothesOutfit);
-        }
+        List<Clothes> clothesList = Stream.of(
+                        outfitRequest.getOuterIdList(),
+                        outfitRequest.getTopIdList(),
+                        outfitRequest.getBottomIdList(),
+                        outfitRequest.getEtcIdList())
+                .flatMap(List::stream)
+                .map(clothesId -> clothesRepository.findById(clothesId)
+                        .orElseThrow(() -> new ClothesNotFoundException("착장을 구성하는 옷이 존재하지 않습니다.")))
+                .toList();
+        Outfit outfit = Outfit.createOutfit(owner, outfitRequest, windChillDto, clothesList);
         outfitRepository.save(outfit);
+        return outfit.getId();
     }
 
     @Transactional
-    public void updateOutfit(Long outfitId, OutfitRequest outfitRequest) throws Exception {
+    public void updateOutfit(Long outfitId, OutfitRequest outfitRequest) {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
-        Outfit outfit = outfitRepository.findById(outfitId).get();
-        if (!isOwner(member, outfit)) {
-            throw new Exception("착장의 소유주가 아닙니다.");
+        Outfit outfit = outfitRepository.findById(outfitId)
+                .orElseThrow(() -> new OutfitNotFoundException("착장을 찾을 수 없습니다."));
+        if (!member.isOwner(outfit)) {
+            throw new UnauthorizedOutfitAccessException("착장의 소유주가 아닙니다.");
         }
-        outfit.setOutfitDate(outfitRequest.getOutfitDate());
-        outfit.setOutfitLocation(outfitRequest.getOutfitLocation());
-        outfit.setHighWc(outfitRequest.getHighWc());
-        outfit.setLowWc(outfitRequest.getLowWc());
-        outfit.setHighTemp(outfitRequest.getHighTemp());
-        outfit.setLowTemp(outfitRequest.getLowTemp());
-        outfit.setOuterRating(outfitRequest.getOuterRating());
-        outfit.setTopRating(outfitRequest.getTopRating());
-        outfit.setBottomRating(outfitRequest.getBottomRating());
-        outfit.setOutfitComment(outfitRequest.getOutfitComment());
-        outfit.setSkyCondition(outfitRequest.getSkyCondition());
-        List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
-        List<Long> clothesList = new ArrayList<>();
-        clothesList.addAll(outfitRequest.getOuterIdList());
-        clothesList.addAll(outfitRequest.getTopIdList());
-        clothesList.addAll(outfitRequest.getBottomIdList());
-        clothesList.addAll(outfitRequest.getEtcIdList());
+
+        List<Clothes> clothesList = Stream.of(
+                        outfitRequest.getOuterIdList(),
+                        outfitRequest.getTopIdList(),
+                        outfitRequest.getBottomIdList(),
+                        outfitRequest.getEtcIdList())
+                .flatMap(List::stream)
+                .map(clothesId -> clothesRepository.findById(clothesId)
+                        .orElseThrow(() -> new ClothesNotFoundException("착장을 구성하는 옷이 존재하지 않습니다.")))
+                .toList();
         for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
             clothesOutfitRepository.deleteClothesOutfit(clothesOutfit.getId());
         }
-        for (Long clothesId : clothesList) {
-            Clothes clothes = clothesRepository.findById(clothesId).get();
-            Optional<ClothesOutfit> clothesOutfit = clothesOutfitRepository.findByClothesAndOutfit(clothes, outfit);
-            if (clothesOutfit.isPresent()) {
-                clothesOutfitList.add(clothesOutfit.get());
-            } else {
-                clothesOutfitList.add(ClothesOutfit.builder()
-                        .clothes(clothes)
-                        .outfit(outfit)
-                        .build());
-            }
-        }
-        outfit.setClothesOutfitList(clothesOutfitList);
+        outfit.update(outfitRequest, clothesList);
         outfitRepository.save(outfit);
     }
 
@@ -133,57 +93,15 @@ public class OutfitService {
         List<Outfit> outfitList = member.getOutfitList();
         WindChillDto todayWindChill = weatherUtil.getTodayWindChill(member.getLocation());
         outfitList.sort(Comparator.comparingInt(o -> calculateWeatherDissimilarity(o, todayWindChill)));
-        if (quantity.isPresent()) {
-            if (quantity.get() < outfitList.size()) {
-                outfitList = outfitList.subList(0, quantity.get());
-            }
+        if (quantity.isPresent() && quantity.get() < outfitList.size()) {
+            outfitList = outfitList.subList(0, quantity.get());
         } else if (outfitList.size() > 10) {
             outfitList = outfitList.subList(0, 10);
         }
         outfitList.sort(Comparator.comparingInt(o -> calculateIndicator(o, todayWindChill)));
-        List<OutfitSummary> outfitSummaryList = new ArrayList<>();
-        for (Outfit outfit : outfitList) {
-            int cntOuter = 0;
-            int cntTop = 0;
-            int cntBottom = 0;
-            Clothes mainOuter = null;
-            Clothes mainTop = null;
-            Clothes mainBottom = null;
-            for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
-                Clothes clothes = clothesOutfit.getClothes();
-                switch (clothes.getCategory()) {
-                    case OUTER -> {
-                        cntOuter++;
-                        if (mainOuter == null) {
-                            mainOuter = clothes;
-                        }
-                    }
-                    case TOP -> {
-                        cntTop++;
-                        if (mainTop == null) {
-                            mainTop = clothes;
-                        }
-                    }
-                    case BOTTOM -> {
-                        cntBottom++;
-                        if (mainBottom == null) {
-                            mainBottom = clothes;
-                        }
-                    }
-                }
-            }
-            OutfitSummary outfitSummary = OutfitSummary.builder()
-                    .outfit(outfit)
-                    .outerUrl(mainOuter.getPhoto().getStoredFilePath())
-                    .topUrl(mainTop.getPhoto().getStoredFilePath())
-                    .bottomUrl(mainBottom.getPhoto().getStoredFilePath())
-                    .isManyOuter(cntOuter > 1)
-                    .isManyTop(cntTop > 1)
-                    .isManyBottom(cntBottom > 1)
-                    .build();
-            outfitSummaryList.add(outfitSummary);
-        }
-        return outfitSummaryList;
+        return outfitList.stream()
+                .map(OutfitSummary::of)
+                .collect(Collectors.toList());
     }
 
     private int calculateIndicator(Outfit outfit, WindChillDto todayWindChill) {
@@ -217,15 +135,16 @@ public class OutfitService {
         Member member = memberRepository.findById(memberId).get();
         String name = member.getName();
         List<OutfitSummary> outfitSummaryList = getOutfitSummaryList(member, quantity);
-        boolean isEnd = member.getOutfitList().size() == outfitSummaryList.size();
+        boolean isEnd = member.getOutfitList().size() >= outfitSummaryList.size();
         return new OutfitListResponse(name, isEnd, outfitSummaryList);
     }
 
-    public OutfitDetailResponse getOutfitDetail(Long outfitId) throws Exception {
+    public OutfitDetailResponse getOutfitDetail(Long outfitId) {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
-        Outfit outfit = outfitRepository.findById(outfitId).get();
-        if (!isOwner(member, outfit)) {
-            throw new Exception("착장의 소유주가 아닙니다.");
+        Outfit outfit = outfitRepository.findById(outfitId)
+                .orElseThrow(() -> new OutfitNotFoundException("착장을 찾을 수 없습니다."));
+        if (!member.isOwner(outfit)) {
+            throw new UnauthorizedOutfitAccessException("착장의 소유주가 아닙니다.");
         }
         return OutfitDetailResponse.builder()
                 .outfit(outfit)
@@ -233,19 +152,16 @@ public class OutfitService {
     }
 
     @Transactional
-    public void deleteOutfit(Long outfitId) throws Exception {
+    public void deleteOutfit(Long outfitId) {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
-        Outfit outfit = outfitRepository.findById(outfitId).get();
-        if (!isOwner(member, outfit)) {
-            throw new Exception("착장의 소유주가 아닙니다.");
+        Outfit outfit = outfitRepository.findById(outfitId)
+                .orElseThrow(() -> new OutfitNotFoundException("착장을 찾을 수 없습니다."));
+        if (!member.isOwner(outfit)) {
+            throw new UnauthorizedOutfitAccessException("착장의 소유주가 아닙니다.");
         }
-        for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
-            clothesOutfitRepository.deleteClothesOutfit(clothesOutfit.getId());
-        }
+        outfit.getClothesOutfitList().stream()
+                .map(ClothesOutfit::getId)
+                .forEach(clothesOutfitRepository::deleteClothesOutfit);
         outfitRepository.deleteOutfit(outfit.getId());
-    }
-
-    private boolean isOwner(Member member, Outfit outfit) {
-        return outfit.getOwner() == member;
     }
 }

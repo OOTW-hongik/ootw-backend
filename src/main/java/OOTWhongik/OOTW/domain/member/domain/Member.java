@@ -53,4 +53,8 @@ public class Member extends BaseTimeEntity {
     public boolean contains(Clothes clothes) {
         return this.clothesList.contains(clothes);
     }
+
+    public boolean isOwner(Outfit outfit) {
+        return this.outfitList.contains(outfit);
+    }
 }

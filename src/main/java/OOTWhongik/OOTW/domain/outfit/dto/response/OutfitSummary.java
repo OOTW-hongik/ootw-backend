@@ -1,5 +1,7 @@
 package OOTWhongik.OOTW.domain.outfit.dto.response;
 
+import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
+import OOTWhongik.OOTW.domain.clothes.domain.ClothesOutfit;
 import OOTWhongik.OOTW.domain.outfit.domain.Outfit;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +26,8 @@ public class OutfitSummary {
     private final boolean isManyBottom;
 
     @Builder
-    public OutfitSummary(Outfit outfit, String outerUrl, String topUrl, String bottomUrl, boolean isManyOuter, boolean isManyTop, boolean isManyBottom) {
+    public OutfitSummary(Outfit outfit, String outerUrl, String topUrl, String bottomUrl,
+                         boolean isManyOuter, boolean isManyTop, boolean isManyBottom) {
         this.outfitId = outfit.getId();
         this.outfitDate = outfit.getOutfitDate();
         this.skyCondition = outfit.getSkyCondition();
@@ -41,5 +44,46 @@ public class OutfitSummary {
         this.isManyOuter = isManyOuter;
         this.isManyTop = isManyTop;
         this.isManyBottom = isManyBottom;
+    }
+
+    public static OutfitSummary of(Outfit outfit) {
+        int cntOuter = 0;
+        int cntTop = 0;
+        int cntBottom = 0;
+        Clothes mainOuter = null;
+        Clothes mainTop = null;
+        Clothes mainBottom = null;
+        for (ClothesOutfit clothesOutfit : outfit.getClothesOutfitList()) {
+            Clothes clothes = clothesOutfit.getClothes();
+            switch (clothes.getCategory()) {
+                case OUTER -> {
+                    cntOuter++;
+                    if (mainOuter == null) {
+                        mainOuter = clothes;
+                    }
+                }
+                case TOP -> {
+                    cntTop++;
+                    if (mainTop == null) {
+                        mainTop = clothes;
+                    }
+                }
+                case BOTTOM -> {
+                    cntBottom++;
+                    if (mainBottom == null) {
+                        mainBottom = clothes;
+                    }
+                }
+            }
+        }
+        return OutfitSummary.builder()
+                .outfit(outfit)
+                .outerUrl(mainOuter.getPhoto().getStoredFilePath())
+                .topUrl(mainTop.getPhoto().getStoredFilePath())
+                .bottomUrl(mainBottom.getPhoto().getStoredFilePath())
+                .isManyOuter(cntOuter > 1)
+                .isManyTop(cntTop > 1)
+                .isManyBottom(cntBottom > 1)
+                .build();
     }
 }
