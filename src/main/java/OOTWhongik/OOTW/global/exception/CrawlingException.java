@@ -9,8 +9,9 @@ public class CrawlingException extends RuntimeException {
         super(message);
     }
 
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this;
-    }
+//    날씨 정보 예외는 계층구조가 복잡해 stack trace 를 살려놓는다.
+//    @Override
+//    public synchronized Throwable fillInStackTrace() {
+//        return this;
+//    }
 }
