@@ -131,7 +131,7 @@ public class OutfitService {
 
     public List<OutfitSummary> getOutfitSummaryList(Member member, Optional<Integer> quantity) {
         List<Outfit> outfitList = member.getOutfitList();
-        WindChillDto todayWindChill = weatherUtil.getTodayWindChill(member.getLocation().getValue());
+        WindChillDto todayWindChill = weatherUtil.getTodayWindChill(member.getLocation());
         outfitList.sort(Comparator.comparingInt(o -> calculateWeatherDissimilarity(o, todayWindChill)));
         if (quantity.isPresent()) {
             if (quantity.get() < outfitList.size()) {

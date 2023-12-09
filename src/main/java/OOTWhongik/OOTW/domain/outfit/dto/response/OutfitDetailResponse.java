@@ -43,7 +43,7 @@ public class OutfitDetailResponse {
     public OutfitDetailResponse(Outfit outfit) {
         this.outfitId = outfit.getId();
         this.outfitDate = outfit.getOutfitDate();
-        this.outfitLocation = outfit.getOutfitLocation();
+        this.outfitLocation = outfit.getOutfitLocation().getValue();
         this.skyCondition = outfit.getSkyCondition();
         this.highWc = outfit.getHighWc();
         this.lowWc = outfit.getLowWc();

@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.domain.outfit.dto.request;
 
+import OOTWhongik.OOTW.domain.member.domain.Location;
 import lombok.Getter;
 
 import java.util.List;
@@ -22,6 +23,10 @@ public class OutfitRequest {
     private List<Long> topIdList;
     private List<Long> bottomIdList;
     private List<Long> etcIdList;
+
+    public Location getOutfitLocation() {
+        return Location.findByValue(outfitLocation);
+    }
 
 
 }
