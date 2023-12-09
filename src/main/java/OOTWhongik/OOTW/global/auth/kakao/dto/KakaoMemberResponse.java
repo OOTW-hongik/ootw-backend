@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.global.auth.kakao.dto;
 
+import OOTWhongik.OOTW.domain.member.domain.Location;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.domain.member.domain.OauthId;
 import OOTWhongik.OOTW.domain.member.domain.Role;
@@ -23,8 +24,8 @@ public record KakaoMemberResponse(
                 .oauthId(new OauthId(String.valueOf(id), KAKAO))
                 .name(kakaoAccount.profile.nickname)
                 .email(kakaoAccount.email)
-                .role(Role.GUEST)
-                .location("서울경기")
+                .role(Role.MEMBER)
+                .location(Location.SEOUL_GYEONGGI)
                 .build();
     }
 

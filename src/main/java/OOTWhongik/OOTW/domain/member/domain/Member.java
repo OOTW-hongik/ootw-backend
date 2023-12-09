@@ -32,33 +32,23 @@ public class Member extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
-    @Column
     private String name;
     @Column(unique = true)
     private String email;
-    @Column
-    private String location;
+    @Enumerated(EnumType.STRING)
+    private Location location;
     @Embedded
     private OauthId oauthId;
-
     @Enumerated(EnumType.STRING)
-    @Column
     private Role role;
 
-    @JsonBackReference
     @OneToMany(mappedBy = "member")
-    private List<Clothes> clothesList = new ArrayList<>();
+    private List<Clothes> clothesList;
 
-    @JsonBackReference
     @OneToMany(mappedBy = "owner")
-    private List<Outfit> outfitList = new ArrayList<>();
+    private List<Outfit> outfitList;
 
-
-    public String getRoleKey() {
-        return this.role.getKey();
-    }
-
-    public void setLocation(String location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 }
