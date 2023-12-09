@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -37,7 +36,7 @@ public class WeatherUtil {
         return 13.12 + 0.6215 * temp - 11.37 * Math.pow(velocity, 0.16) + 0.3965 * Math.pow(velocity, 0.16) * temp;
     }
     
-    public WeatherSummary getWeatherSummary(String outfitDate, String outfitLocation) throws IOException {
+    public WeatherSummary getWeatherSummary(String outfitDate, String outfitLocation) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formatedNow = LocalDate.now().format(formatter);
         System.out.println("formatedNow = " + formatedNow);
@@ -50,7 +49,7 @@ public class WeatherUtil {
         }
     }
 
-    public WeatherSummary getPastWeatherSummary(String outfitDate, String outfitLocation) throws IOException {
+    public WeatherSummary getPastWeatherSummary(String outfitDate, String outfitLocation) {
         String jijum_id = jijumIdMap.get(outfitLocation);
         String date = outfitDate.substring(0, 10);
         double highTemp;
@@ -87,7 +86,7 @@ public class WeatherUtil {
                 .build();
     }
 
-    public WeatherSummary getTodayWeatherSummary(String outfitLocation) throws IOException {
+    public WeatherSummary getTodayWeatherSummary(String outfitLocation) {
         String rid = ridMap.get(outfitLocation);
         int highTemp;
         int lowTemp;
@@ -126,7 +125,7 @@ public class WeatherUtil {
                 .build();
     }
 
-    public List<WeatherGraphInfo> getWeatherGraphInfo(String location) throws IOException {
+    public List<WeatherGraphInfo> getWeatherGraphInfo(String location) {
         String rid = ridMap.get(location);
         Document httpResponse = httpConn.getCrawling(
                 UriComponentsBuilder
@@ -148,7 +147,7 @@ public class WeatherUtil {
         return weatherGraphInfoList;
     }
 
-    public WindChillDto getWindChill(String outfitDate, String outfitLocation) throws IOException {
+    public WindChillDto getWindChill(String outfitDate, String outfitLocation) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formatedNow = LocalDate.now().format(formatter);
         System.out.println("formatedNow = " + formatedNow);
@@ -161,7 +160,7 @@ public class WeatherUtil {
         }
     }
 
-    public WindChillDto getTodayWindChill(String outfitLocation) throws IOException {
+    public WindChillDto getTodayWindChill(String outfitLocation) {
         String rid = ridMap.get(outfitLocation);
         Document httpResponse = httpConn.getCrawling(
                 UriComponentsBuilder
