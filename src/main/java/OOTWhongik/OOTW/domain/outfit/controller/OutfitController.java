@@ -8,12 +8,12 @@ import OOTWhongik.OOTW.domain.outfit.service.OutfitService;
 import OOTWhongik.OOTW.domain.outfit.service.WeatherUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.net.URI;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @Tag(name = "outfit", description = "outfit")
 @RequiredArgsConstructor
@@ -25,43 +25,45 @@ public class OutfitController {
 
     @Operation(summary = "outfit list", description = "착장 리스트 조회")
     @GetMapping("/list")
-    public OutfitListResponse getOutfitList (@RequestParam(required = false) Optional<Integer> quantity) throws IOException {
+    public OutfitListResponse getOutfitList (@RequestParam(required = false) Optional<Integer> quantity) {
         return outfitService.getOutfitList(quantity);
     }
 
     @Operation(summary = "outfit detail", description = "착장 상세 페이지")
     @GetMapping("/{outfitId}")
-    public OutfitDetailResponse outfitDetail(@PathVariable Long outfitId) throws Exception {
+    public OutfitDetailResponse outfitDetail(@PathVariable Long outfitId) {
         return outfitService.getOutfitDetail(outfitId);
     }
 
     @Operation(summary = "outfit register", description = "착장 생성 시 날씨 조회")
     @GetMapping("/register")
     public WeatherSummary outfitRegister(@RequestParam String outfitDate,
-                                         @RequestParam String outfitLocation) throws IOException {
+                                         @RequestParam String outfitLocation) {
         return weatherUtil.getWeatherSummary(outfitDate, outfitLocation);
     }
 
     @Operation(summary = "outfit creation", description = "착장 생성")
     @PostMapping
-    public ResponseEntity<?> saveOutfit(@RequestBody OutfitRequest outfitRequest) throws IOException {
-        outfitService.saveOutfit(outfitRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> saveOutfit(@RequestBody OutfitRequest outfitRequest) {
+        Long outfitId = outfitService.saveOutfit(outfitRequest);
+        return ResponseEntity
+                .created(URI.create("/outfit/" + outfitId))
+                .build();
     }
 
     @Operation(summary = "outfit update", description = "착장 수정")
     @PutMapping("/{outfitId}")
     public ResponseEntity<?> updateOutfit(@PathVariable Long outfitId,
-                                          @RequestBody OutfitRequest outfitRequest) throws Exception {
+                                          @RequestBody OutfitRequest outfitRequest) {
         outfitService.updateOutfit(outfitId, outfitRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "outfit delete", description = "착장 삭제")
     @DeleteMapping("/{outfitId}")
-    public ResponseEntity<?> outfitDelete(@PathVariable Long outfitId) throws Exception {
+    public ResponseEntity<?> outfitDelete(@PathVariable Long outfitId) {
         outfitService.deleteOutfit(outfitId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }
