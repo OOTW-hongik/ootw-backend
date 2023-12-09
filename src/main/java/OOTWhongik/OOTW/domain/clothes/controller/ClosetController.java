@@ -3,6 +3,7 @@ package OOTWhongik.OOTW.domain.clothes.controller;
 import OOTWhongik.OOTW.domain.clothes.dto.response.ClosetResponse;
 import OOTWhongik.OOTW.domain.clothes.dto.request.ClothesRequest;
 import OOTWhongik.OOTW.domain.clothes.dto.response.ClothesDetailResponse;
+import OOTWhongik.OOTW.domain.clothes.dto.response.ClothesResponse;
 import OOTWhongik.OOTW.domain.clothes.service.ClosetService;
 import OOTWhongik.OOTW.domain.clothes.service.ClothesService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.net.URI;
 
 @Tag(name = "closet", description = "closet")
 @RequiredArgsConstructor
@@ -37,9 +38,11 @@ public class ClosetController {
     @Operation(summary = "clothes creation", description = "옷 등록")
     @PostMapping("/clothes")
     public ResponseEntity<?> saveClothes(@RequestPart ClothesRequest clothesRequest,
-                                         @RequestPart MultipartFile clothesPhoto) throws IOException {
-        clothesService.saveClothes(clothesRequest, clothesPhoto);
-        return ResponseEntity.ok().build();
+                                         @RequestPart MultipartFile clothesPhoto) {
+        long clothesId = clothesService.saveClothes(clothesRequest, clothesPhoto);
+        return ResponseEntity
+                .created(URI.create("/clothes/" + clothesId))
+                .build();
     }
 
     @Operation(summary = "clothes update", description = "옷 수정")
@@ -47,16 +50,16 @@ public class ClosetController {
     public ResponseEntity<?> updateClothes(@PathVariable Long clothesId,
                                            @RequestPart ClothesRequest clothesRequest,
                                            @RequestPart MultipartFile clothesPhoto) throws Exception {
-        clothesService.updateClothes(clothesId, clothesRequest, clothesPhoto);
-        return ResponseEntity.ok().build();
+        ClothesResponse clothesResponse = clothesService.updateClothes(clothesId, clothesRequest, clothesPhoto);
+        return ResponseEntity.ok().body(clothesResponse);
     }
 
     @Operation(summary = "clothes update", description = "사진제외 옷 수정")
     @PatchMapping("/clothes/{clothesId}")
     public ResponseEntity<?> updateClothesWithoutPhoto(@PathVariable Long clothesId,
-                                                       @RequestBody ClothesRequest clothesRequest) throws Exception {
-        clothesService.updateClothes(clothesId, clothesRequest);
-        return ResponseEntity.ok().build();
+                                                       @RequestBody ClothesRequest clothesRequest) {
+        ClothesResponse clothesResponse = clothesService.updateClothes(clothesId, clothesRequest);
+        return ResponseEntity.ok().body(clothesResponse);
     }
 
     @Operation(summary = "clothes detail", description = "옷 상세 페이지")
@@ -67,9 +70,9 @@ public class ClosetController {
 
     @Operation(summary = "clothes delete", description = "옷 삭제")
     @DeleteMapping("/clothes/{clothesId}")
-    public ResponseEntity<?> deleteClothes(@PathVariable Long clothesId) throws Exception {
+    public ResponseEntity<?> deleteClothes(@PathVariable Long clothesId) {
         clothesService.deleteClothes(clothesId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

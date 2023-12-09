@@ -24,17 +24,18 @@ public class ClothesService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void saveClothes(ClothesRequest clothesRequest, MultipartFile file) throws IOException {
+    public Long saveClothes(ClothesRequest clothesRequest, MultipartFile file) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Clothes clothes = clothesRequest.toEntity(); // 사진 아직 저장되지 않음
         clothes.addMember(memberRepository.findById(memberId).get());
         clothesRepository.save(clothes);
         Photo photo = photoService.uploadPhoto(file, clothes.getId());
         clothes.setPhoto(photo);
+        return clothes.getId();
     }
 
     @Transactional
-    public void updateClothes(Long clothesId, ClothesRequest clothesRequest, MultipartFile file) throws Exception {
+    public ClothesResponse updateClothes(Long clothesId, ClothesRequest clothesRequest, MultipartFile file) throws Exception {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
         Clothes clothes = clothesRepository.findById(clothesId).get();
         if (!isOwner(member, clothes)) {
@@ -43,17 +44,19 @@ public class ClothesService {
         clothes.update(clothesRequest);
         Photo photo = photoService.updatePhoto(file, clothes.getId(), clothes.getPhoto().getId());
         clothes.setPhoto(photo);
+        return ClothesResponse.from(clothes);
     }
 
 
     @Transactional
-    public void updateClothes(Long clothesId, ClothesRequest clothesRequest) throws Exception {
+    public ClothesResponse updateClothes(Long clothesId, ClothesRequest clothesRequest) {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
         Clothes clothes = clothesRepository.findById(clothesId).get();
         if (!isOwner(member, clothes)) {
             throw new Exception("옷의 소유주가 아닙니다.");
         }
         clothes.update(clothesRequest);
+        return ClothesResponse.from(clothes);
     }
 
     @Transactional
