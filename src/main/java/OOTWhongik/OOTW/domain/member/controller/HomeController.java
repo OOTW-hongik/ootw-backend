@@ -5,6 +5,7 @@ import OOTWhongik.OOTW.domain.member.dto.response.HomeResponse;
 import OOTWhongik.OOTW.domain.member.service.HomeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class HomeController {
 
     @Operation(summary = "update location", description = "update location")
     @PutMapping("/location")
-    public ResponseEntity<?> updateLocation(@RequestBody LocationRequest locationRequest) {
+    public ResponseEntity<?> updateLocation(@RequestBody @Valid LocationRequest locationRequest) {
         homeService.updateLocation(locationRequest);
         return ResponseEntity.ok().build();
     }

@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.net.URI;
 import java.util.Optional;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +46,7 @@ public class OutfitController {
 
     @Operation(summary = "outfit creation", description = "착장 생성")
     @PostMapping
-    public ResponseEntity<?> saveOutfit(@RequestBody OutfitRequest outfitRequest) {
+    public ResponseEntity<?> saveOutfit(@RequestBody @Valid OutfitRequest outfitRequest) {
         Long outfitId = outfitService.saveOutfit(outfitRequest);
         return ResponseEntity
                 .created(URI.create("/outfit/" + outfitId))
@@ -54,7 +56,7 @@ public class OutfitController {
     @Operation(summary = "outfit update", description = "착장 수정")
     @PutMapping("/{outfitId}")
     public ResponseEntity<?> updateOutfit(@PathVariable Long outfitId,
-                                          @RequestBody OutfitRequest outfitRequest) {
+                                          @RequestBody @Valid OutfitRequest outfitRequest) {
         outfitService.updateOutfit(outfitId, outfitRequest);
         return ResponseEntity.noContent().build();
     }

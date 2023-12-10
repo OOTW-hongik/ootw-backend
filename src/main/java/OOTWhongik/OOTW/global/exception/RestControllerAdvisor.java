@@ -9,12 +9,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @RestControllerAdvice
 public class RestControllerAdvisor {
@@ -83,6 +85,15 @@ public class RestControllerAdvisor {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleCrawlingException() throws JsonProcessingException {
         return responseJsonMessage("날씨 정보를 가져오는데 실패했습니다.");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleMethodArgumentNotValidException(MethodArgumentNotValidException ex)
+            throws JsonProcessingException {
+        return responseJsonMessage(
+                Objects.requireNonNullElse(
+                        ex.getBindingResult().getFieldError().getDefaultMessage(), "입력이 잘못되었습니다."));
     }
 
     private String responseJsonMessage(String message) throws JsonProcessingException {

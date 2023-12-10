@@ -8,6 +8,7 @@ import OOTWhongik.OOTW.domain.clothes.service.ClosetService;
 import OOTWhongik.OOTW.domain.clothes.service.ClothesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class ClosetController {
 
     @Operation(summary = "clothes creation", description = "옷 등록")
     @PostMapping("/clothes")
-    public ResponseEntity<?> saveClothes(@RequestPart ClothesRequest clothesRequest,
+    public ResponseEntity<?> saveClothes(@RequestPart @Valid ClothesRequest clothesRequest,
                                          @RequestPart MultipartFile clothesPhoto) {
         long clothesId = clothesService.saveClothes(clothesRequest, clothesPhoto);
         return ResponseEntity
@@ -48,7 +49,7 @@ public class ClosetController {
     @Operation(summary = "clothes update", description = "옷 수정")
     @PutMapping("/clothes/{clothesId}")
     public ResponseEntity<?> updateClothes(@PathVariable Long clothesId,
-                                           @RequestPart ClothesRequest clothesRequest,
+                                           @RequestPart @Valid ClothesRequest clothesRequest,
                                            @RequestPart MultipartFile clothesPhoto) throws Exception {
         ClothesResponse clothesResponse = clothesService.updateClothes(clothesId, clothesRequest, clothesPhoto);
         return ResponseEntity.ok().body(clothesResponse);
@@ -57,7 +58,7 @@ public class ClosetController {
     @Operation(summary = "clothes update", description = "사진제외 옷 수정")
     @PatchMapping("/clothes/{clothesId}")
     public ResponseEntity<?> updateClothesWithoutPhoto(@PathVariable Long clothesId,
-                                                       @RequestBody ClothesRequest clothesRequest) {
+                                                       @RequestBody @Valid ClothesRequest clothesRequest) {
         ClothesResponse clothesResponse = clothesService.updateClothes(clothesId, clothesRequest);
         return ResponseEntity.ok().body(clothesResponse);
     }
