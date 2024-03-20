@@ -1,21 +1,20 @@
 package OOTWhongik.OOTW.domain.outfit.controller;
 
-import OOTWhongik.OOTW.domain.outfit.dto.response.WeatherSummary;
+import OOTWhongik.OOTW.domain.outfit.dto.request.OutfitRequest;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitDetailResponse;
 import OOTWhongik.OOTW.domain.outfit.dto.response.OutfitListResponse;
-import OOTWhongik.OOTW.domain.outfit.dto.request.OutfitRequest;
+import OOTWhongik.OOTW.domain.outfit.dto.response.WeatherSummary;
 import OOTWhongik.OOTW.domain.outfit.service.OutfitService;
 import OOTWhongik.OOTW.domain.outfit.service.WeatherUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import java.net.URI;
-import java.util.Optional;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.Optional;
 
 @Tag(name = "outfit", description = "outfit")
 @RequiredArgsConstructor

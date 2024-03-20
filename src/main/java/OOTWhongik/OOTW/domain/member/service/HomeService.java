@@ -27,7 +27,7 @@ public class HomeService {
 
     public HomeResponse getHome() {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberRepository.findById(memberId).get();
+        Member member = memberRepository.getReferenceById(memberId);
         WeatherSummary weatherSummary = weatherUtil.getTodayWeatherSummary(member.getLocation().getValue());
         List<WeatherGraphInfo> weatherGraphInfoList = weatherUtil.getWeatherGraphInfo(member.getLocation().getValue());
         List<OutfitSummary> outfitSummaryList = outfitService.getOutfitSummaryList(member, Optional.of(3));
@@ -48,7 +48,7 @@ public class HomeService {
     @Transactional
     public void updateLocation(LocationRequest locationRequest) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberRepository.findById(memberId).get();
+        Member member = memberRepository.getReferenceById(memberId);
         member.setLocation(locationRequest.getLocation());
     }
 }

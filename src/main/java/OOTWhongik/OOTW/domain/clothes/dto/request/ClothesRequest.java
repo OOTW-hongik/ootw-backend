@@ -3,6 +3,7 @@ package OOTWhongik.OOTW.domain.clothes.dto.request;
 import OOTWhongik.OOTW.domain.clothes.domain.Category;
 import OOTWhongik.OOTW.domain.clothes.domain.Clothes;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
@@ -11,7 +12,7 @@ public class ClothesRequest {
     @NotBlank(message = "서브 카테고리가 필요합니다.")
     private String subCategory;
     private String clothesComment;
-    @NotBlank(message = "옷을 숨겼는지 입력되지 않았습니다.")
+    @NotNull(message = "옷을 숨겼는지 입력되지 않았습니다.")
     private boolean hidden;
 
     public Clothes toEntity() {

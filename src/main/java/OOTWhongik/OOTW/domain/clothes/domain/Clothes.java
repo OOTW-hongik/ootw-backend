@@ -4,12 +4,8 @@ import OOTWhongik.OOTW.domain.clothes.dto.request.ClothesRequest;
 import OOTWhongik.OOTW.domain.member.domain.Member;
 import OOTWhongik.OOTW.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -36,15 +32,12 @@ public class Clothes extends BaseTimeEntity {
     private Member member;
 
     @OneToMany(mappedBy = "clothes")
-    private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
+    private List<ClothesOutfit> clothesOutfitList;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "photo_id")
     private Photo photo;
-
-    public void setPhoto(Photo photo) {
-        this.photo = photo;
-    }
 
     public void update(ClothesRequest clothesRequest) {
         this.category = clothesRequest.getCategory();

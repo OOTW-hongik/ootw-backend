@@ -53,7 +53,7 @@ public class Outfit extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "outfit", cascade = CascadeType.ALL)
     @OrderColumn(name = "position")
-    private List<ClothesOutfit> clothesOutfitList = new ArrayList<>();
+    private List<ClothesOutfit> clothesOutfitList;
 
     public static Outfit createOutfit(Member owner, OutfitRequest outfitRequest,
                                       WindChillDto windChillDto, List<Clothes> clothesList) {

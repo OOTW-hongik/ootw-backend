@@ -170,17 +170,17 @@ public class WeatherUtil {
 
     public WindChillDto getWindChill(String outfitDate, Location outfitLocation) {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-        LocalDate formatedOutfitDate;
+        LocalDate formattedOutfitDate;
         try {
-            formatedOutfitDate = LocalDate.parse(outfitDate.substring(0, 10), formatter);
+            formattedOutfitDate = LocalDate.parse(outfitDate.substring(0, 10), formatter);
         } catch (DateTimeParseException | StringIndexOutOfBoundsException ex) {
             throw new InvalidDateException("잘못된 형식의 날짜가 입력되었습니다.");
         }
         try {
-            if (formatedOutfitDate.isEqual(LocalDate.now())) {
+            if (formattedOutfitDate.isEqual(LocalDate.now())) {
                 //오늘이면
                 return getTodayWindChill(outfitLocation);
-            } else if (formatedOutfitDate.isBefore(LocalDate.now())) {
+            } else if (formattedOutfitDate.isBefore(LocalDate.now())) {
                 //과거이면
                 return getPastWindChill(outfitDate, outfitLocation);
             } else {

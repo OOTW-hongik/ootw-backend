@@ -33,7 +33,6 @@ public class OauthService {
         String jws = JwtUtils.createToken(saved);
         Map<String, String> map = new HashMap<>();
         map.put("jwt", jws);
-        String ret =  new ObjectMapper().writeValueAsString(map);
-        return ret;
+        return new ObjectMapper().writeValueAsString(map);
     }
 }
