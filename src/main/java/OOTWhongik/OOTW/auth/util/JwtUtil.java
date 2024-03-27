@@ -27,7 +27,7 @@ public class JwtUtil {
 
     private static String secretKey;
 
-    private static String expirationTimeHour;
+    private static Long expirationTimeHour;
 
     //cannot field inject to static properties
     //@Value can use on setter
@@ -37,20 +37,18 @@ public class JwtUtil {
     }
 
     @Value("${jwt.expiration_time_hour}")
-    public void setExpirationTimeHour(String expirationTimeHour) {
+    public void setExpirationTimeHour(Long expirationTimeHour) {
         JwtUtil.expirationTimeHour = expirationTimeHour;
     }
 
     public static String createToken(Member member) {
-        Claims claims = Jwts.claims();
-        claims.put("sub", member.getId());
-        claims.put("role", member.getRole());
-        claims.put("name", member.getName());
-        Date now = new Date();
-        Date expiration = new Date(now.getTime() + Duration.ofHours(Long.parseLong(expirationTimeHour)).toMillis());
+        Date issuedAt = new Date();
+        Date expiration = new Date(issuedAt.getTime() + Duration.ofHours(expirationTimeHour).toMillis());
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
+                .setIssuer("OOTW-hongik")
+                .setIssuedAt(issuedAt)
+                .setSubject(member.getId().toString())
+                .claim("role", member.getRole())
                 .setExpiration(expiration)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
