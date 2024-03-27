@@ -13,7 +13,7 @@ public class OutfitRequest {
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}\\((월|화|수|목|금|토|일)\\)$",
             message = "날짜 형식이 잘못되었습니다. 'yyyy-MM-dd(요일)' 형식으로 입력해주세요.")
     private String outfitDate;
-    private String outfitLocation;
+    private Location outfitLocation;
     @Min(value = 1, message = "하늘 상태값은 1 이상이어야 합니다.")
     @Max(value = 5, message = "하늘 상태값은 5 이하이어야 합니다.")
     private int skyCondition;
@@ -46,10 +46,4 @@ public class OutfitRequest {
     private List<Long> topIdList;
     private List<Long> bottomIdList;
     private List<Long> etcIdList;
-
-    public Location getOutfitLocation() {
-        return Location.findByValue(outfitLocation);
-    }
-
-
 }

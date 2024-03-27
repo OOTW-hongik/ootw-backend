@@ -29,13 +29,13 @@ public class HomeService {
     public HomeResponse getHome() {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.getReferenceById(memberId);
-        WeatherSummary weatherSummary = weatherUtil.getTodayWeatherSummary(member.getLocation().getValue());
-        List<WeatherGraphInfo> weatherGraphInfoList = weatherUtil.getWeatherGraphInfo(member.getLocation().getValue());
+        WeatherSummary weatherSummary = weatherUtil.getTodayWeatherSummary(member.getLocation());
+        List<WeatherGraphInfo> weatherGraphInfoList = weatherUtil.getWeatherGraphInfo(member.getLocation());
         List<OutfitSummary> outfitSummaryList = outfitService.getOutfitSummaryList(member, Optional.of(3));
         if (outfitSummaryList.size() > 3) outfitSummaryList = outfitSummaryList.subList(0, 3);
         return HomeResponse.builder()
                 .name(member.getName())
-                .location(member.getLocation().getValue())
+                .location(member.getLocation().getRegion())
                 .skyCondition(weatherSummary.getSkyCondition())
                 .highTemp(weatherSummary.getHighTemp())
                 .lowTemp(weatherSummary.getLowTemp())
@@ -50,6 +50,6 @@ public class HomeService {
     public void updateLocation(LocationRequest locationRequest) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.getReferenceById(memberId);
-        member.setLocation(locationRequest.getLocation());
+        member.updateLocation(locationRequest.getLocation());
     }
 }

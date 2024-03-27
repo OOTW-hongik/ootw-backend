@@ -1,5 +1,6 @@
 package OOTWhongik.OOTW.outfit.controller;
 
+import OOTWhongik.OOTW.member.domain.Location;
 import OOTWhongik.OOTW.outfit.dto.request.OutfitRequest;
 import OOTWhongik.OOTW.outfit.dto.response.OutfitDetailResponse;
 import OOTWhongik.OOTW.outfit.dto.response.OutfitListResponse;
@@ -39,7 +40,7 @@ public class OutfitController {
     @Operation(summary = "outfit register", description = "착장 생성 시 날씨 조회")
     @GetMapping("/register")
     public WeatherSummary outfitRegister(@RequestParam String outfitDate,
-                                         @RequestParam String outfitLocation) {
+                                         @RequestParam Location outfitLocation) {
         return weatherUtil.getWeatherSummary(outfitDate, outfitLocation);
     }
 

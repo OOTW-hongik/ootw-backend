@@ -1,14 +1,12 @@
 package OOTWhongik.OOTW.member.dto.request;
 
 import OOTWhongik.OOTW.member.domain.Location;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 
+@Getter
 public class LocationRequest {
 
-    @NotBlank(message = "지역을 입력해주세요.")
-    private String location;
-
-    public Location getLocation() {
-        return Location.findByValue(location);
-    }
+    @NotNull(message = "지역을 입력해주세요.")
+    private Location location;
 }

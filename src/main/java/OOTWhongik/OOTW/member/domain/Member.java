@@ -46,7 +46,7 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "owner")
     private List<Outfit> outfitList;
 
-    public void setLocation(Location location) {
+    public void updateLocation(Location location) {
         this.location = location;
     }
 

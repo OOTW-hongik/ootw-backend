@@ -1,6 +1,7 @@
 package OOTWhongik.OOTW.config;
 
-import OOTWhongik.OOTW.auth.converter.OauthServerTypeConverter;
+import OOTWhongik.OOTW.auth.controller.converter.OauthServerTypeConverter;
+import OOTWhongik.OOTW.outfit.controller.converter.LocationConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -35,5 +36,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new OauthServerTypeConverter());
+        registry.addConverter(new LocationConverter());
     }
 }

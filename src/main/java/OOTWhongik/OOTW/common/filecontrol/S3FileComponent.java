@@ -47,10 +47,10 @@ public class S3FileComponent {
         for (MultipartFile mf : multipartFile) {
             String contentType = mf.getContentType();
             if (ObjectUtils.isEmpty(contentType)) {
-                throw new FileUploadException("파일의 contentType이 없습니다.");
+                throw new FileUploadException("파일의 Content Type이 없습니다.");
             } else if (!(contentType.equals(ContentType.IMAGE_JPEG.toString())
                     || contentType.equals(ContentType.IMAGE_PNG.toString()))){
-                throw new FileUploadException("파일의 contentType이 지원되지 않습니다..");
+                throw new FileUploadException("파일의 Content Type이 지원되지 않습니다..");
             }
         }
         List<String> listUrl = new ArrayList<>();

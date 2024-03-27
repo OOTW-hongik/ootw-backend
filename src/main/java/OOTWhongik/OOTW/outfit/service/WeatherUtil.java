@@ -5,9 +5,10 @@ import OOTWhongik.OOTW.outfit.dto.WindChillDto;
 import OOTWhongik.OOTW.outfit.dto.response.WeatherGraphInfo;
 import OOTWhongik.OOTW.outfit.dto.response.WeatherSummary;
 import OOTWhongik.OOTW.outfit.exception.InvalidDateException;
-import OOTWhongik.OOTW.common.httpconnection.HttpConn;
 import OOTWhongik.OOTW.outfit.exception.CrawlingException;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -24,8 +26,6 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class WeatherUtil {
-
-    private final HttpConn httpConn;
 
     @Value("${weather.url.past}")
     private String pastUrl;
@@ -36,24 +36,13 @@ public class WeatherUtil {
     @Value("${weather.api.auth_key}")
     private String authKey;
 
-    public static double tempToWc(double temp, double velocity) {
-        return 13.12 + 0.6215 * temp - 11.37 * Math.pow(velocity, 0.16) + 0.3965 * Math.pow(velocity, 0.16) * temp;
-    }
-
-    public WeatherSummary getWeatherSummary(String outfitDate, String outfitLocation) {
+    public WeatherSummary getWeatherSummary(String outfitDate, Location outfitLocation) {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-        LocalDate formatedOutfitDate;
+        LocalDate formattedOutfitDate = parseLocalDate(outfitDate, formatter);
         try {
-            formatedOutfitDate = LocalDate.parse(outfitDate, formatter);
-        } catch (DateTimeParseException | StringIndexOutOfBoundsException ex) {
-            throw new InvalidDateException("잘못된 형식의 날짜가 입력되었습니다.");
-        }
-        try {
-            if (formatedOutfitDate.isEqual(LocalDate.now())) {
-                //오늘이면
+            if (formattedOutfitDate.isEqual(LocalDate.now())) {
                 return getTodayWeatherSummary(outfitLocation);
-            } else if (formatedOutfitDate.isBefore(LocalDate.now())) {
-                //과거이면
+            } else if (formattedOutfitDate.isBefore(LocalDate.now())) {
                 return getPastWeatherSummary(outfitDate, outfitLocation);
             } else {
                 throw new InvalidDateException("미래의 날짜가 입력되었습니다.");
@@ -63,15 +52,23 @@ public class WeatherUtil {
         }
     }
 
-    public WeatherSummary getPastWeatherSummary(String outfitDate, String outfitLocation) {
-        String jijum_id = jijumIdMap.get(outfitLocation);
+    private LocalDate parseLocalDate(String outfitDate, DateTimeFormatter formatter) {
+        try {
+            return LocalDate.parse(outfitDate, formatter);
+        } catch (DateTimeParseException | StringIndexOutOfBoundsException ex) {
+            throw new InvalidDateException("잘못된 형식의 날짜가 입력되었습니다.");
+        }
+    }
+
+    public WeatherSummary getPastWeatherSummary(String outfitDate, Location outfitLocation) {
+        String jijum_id = outfitLocation.getJijumId();
         String date = outfitDate.substring(0, 10);
         double highTemp;
         double lowTemp;
         int highWc;
         int lowWc;
         int skyCondition = 0;
-        Document httpResponse = httpConn.getCrawling(
+        Document httpResponse = getCrawling(
                 UriComponentsBuilder
                         .fromUriString(pastUrl)
                         .queryParam("jijum_id", jijum_id)
@@ -83,8 +80,8 @@ public class WeatherUtil {
         highTemp = Double.parseDouble(elements.get(7).text());
         lowTemp = Double.parseDouble(elements.get(9).text());
         double velocity = Double.parseDouble(elements.get(15).text());
-        highWc = (int) Math.round(WeatherUtil.tempToWc(highTemp, velocity));
-        lowWc = (int) Math.round(WeatherUtil.tempToWc(lowTemp, velocity));
+        highWc = (int) Math.round(convertTempToWc(highTemp, velocity));
+        lowWc = (int) Math.round(convertTempToWc(lowTemp, velocity));
         element = httpResponse.select("font").select("[color=#27385A]").get(9);
         String[] weathers = element.text().split("/");
         for (String weather : weathers) {
@@ -99,31 +96,31 @@ public class WeatherUtil {
                 .build();
     }
 
-    public WeatherSummary getTodayWeatherSummary(String outfitLocation) {
-        String rid = ridMap.get(outfitLocation);
+    public WeatherSummary getTodayWeatherSummary(Location outfitLocation) {
+        String rid = outfitLocation.getRid();
         int highTemp;
         int lowTemp;
         int highWc;
         int lowWc;
-        Document httpResponse = httpConn.getCrawling(
+        Document document = getCrawling(
                 UriComponentsBuilder
                         .fromUriString(todayUrl)
                         .queryParam("rid", rid)
                         .toUriString()
         );
         //온도 파악
-        Element element = httpResponse.select("td").select(".f11").first();
+        Element element = document.select("td").select(".f11").first();
         String[] tempList = element.text().split("˚C");
         highTemp = (int) Math.round(Double.parseDouble(tempList[0].trim()));
         lowTemp = (int) Math.round(Double.parseDouble(tempList[1].trim()));
         //풍속 파악
-        element = httpResponse.select("td").select("[color=\"7f7f7f\"]").first();
+        element = document.select("td").select("[color=\"7f7f7f\"]").first();
         String[] velocityList = element.text().split(" ");
         int velocity = Integer.parseInt(velocityList[0].trim());
-        highWc = (int) Math.round(WeatherUtil.tempToWc(highTemp, velocity));
-        lowWc = (int) Math.round(WeatherUtil.tempToWc(lowTemp, velocity));
+        highWc = (int) Math.round(convertTempToWc(highTemp, velocity));
+        lowWc = (int) Math.round(convertTempToWc(lowTemp, velocity));
         //skyCondition 파악
-        element = httpResponse.select("td").select("[width=\"50%\"]").get(1);
+        element = document.select("td").select("[width=\"50%\"]").get(1);
         String html = element.html();
         String imgSrcStart = "https://api3.weatheri.co.kr/web/images/icon_2013_01/";
         int idx = html.indexOf(imgSrcStart);
@@ -138,9 +135,94 @@ public class WeatherUtil {
                 .build();
     }
 
-    public List<WeatherGraphInfo> getWeatherGraphInfo(String location) {
-        String rid = ridMap.get(location);
-        Document httpResponse = httpConn.getCrawling(
+    public WindChillDto getWindChill(String outfitDate, Location outfitLocation) {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate formattedOutfitDate;
+        try {
+            formattedOutfitDate = LocalDate.parse(outfitDate.substring(0, 10), formatter);
+        } catch (DateTimeParseException | StringIndexOutOfBoundsException ex) {
+            throw new InvalidDateException("잘못된 형식의 날짜가 입력되었습니다.");
+        }
+        try {
+            if (formattedOutfitDate.isEqual(LocalDate.now())) {
+                return getTodayWindChill(outfitLocation);
+            } else if (formattedOutfitDate.isBefore(LocalDate.now())) {
+                return getPastWindChill(outfitDate, outfitLocation);
+            } else {
+                throw new InvalidDateException("미래의 날짜가 입력되었습니다.");
+            }
+        } catch (Exception ex) {
+            throw new CrawlingException("날씨 정보를 가져오는데 실패했습니다.");
+        }
+    }
+
+    public WindChillDto getTodayWindChill(Location outfitLocation) {
+        String rid = outfitLocation.getRid();
+        Document httpResponse = getCrawling(
+                UriComponentsBuilder
+                        .fromUriString(todayUrl)
+                        .queryParam("rid", rid)
+                        .toUriString()
+        );
+        Element element1 = httpResponse.select("table").select("[bgcolor=#BCBFC2]").get(2);
+        Element element2 = element1.select("tr").select("[bgcolor=#ffffff]").get(8);
+        Element element3 = element1.select("tr").select("[bgcolor=#ffffff]").get(10);
+        String[] temp = element2.text().trim().split(" ");
+        String[] velocity = element3.text().trim().split(" ");
+
+        try {
+            return WindChillDto.builder()
+                    .wcAt6((int) convertTempToWc(Double.parseDouble(temp[2]), Double.parseDouble(velocity[2])))
+                    .wcAt9((int) convertTempToWc(Double.parseDouble(temp[3]), Double.parseDouble(velocity[3])))
+                    .wcAt12((int) convertTempToWc(Double.parseDouble(temp[4]), Double.parseDouble(velocity[4])))
+                    .wcAt15((int) convertTempToWc(Double.parseDouble(temp[5]), Double.parseDouble(velocity[5])))
+                    .wcAt18((int) convertTempToWc(Double.parseDouble(temp[6]), Double.parseDouble(velocity[6])))
+                    .wcAt21((int) convertTempToWc(Double.parseDouble(temp[7]), Double.parseDouble(velocity[7])))
+                    .wcAt24((int) convertTempToWc(Double.parseDouble(temp[8]), Double.parseDouble(velocity[8])))
+                    .build();
+        } catch (IndexOutOfBoundsException ex) {
+            throw new CrawlingException("오늘 체감 온도를 가져오는데 실패했습니다. 날씨 정보는 있지만 충분하지 않습니다.");
+        } catch (NumberFormatException ex) {
+            throw new CrawlingException("오늘 체감 온도를 가져오는데 실패했습니다. 날씨 정보가 숫자가 아닙니다.");
+        }
+    }
+
+    private WindChillDto getPastWindChill(String outfitDate, Location outfitLocation) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(outfitDate.substring(0, 10), formatter);
+        LocalDate nextDay = date.plusDays(1);
+        String uri = UriComponentsBuilder
+                .fromUriString("https://apihub.kma.go.kr")
+                .path("/api/typ01/url/kma_sfctm3.php")
+                .queryParam("tm1", date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0600")
+                .queryParam("tm2", nextDay.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000")
+                .queryParam("stn", outfitLocation.getJijumId())
+                .queryParam("authKey", authKey)
+                .toUriString();
+        String response = new RestTemplate().getForEntity(uri, String.class).getBody();
+        String[] weathers = response.split("\n");
+
+        return WindChillDto.builder()
+                .wcAt6((int) convertTempToWc(Double.parseDouble(weathers[4].split("\\s+")[11]),
+                        Double.parseDouble(weathers[4].split("\\s+")[3])))
+                .wcAt9((int) convertTempToWc(Double.parseDouble(weathers[7].split("\\s+")[11]),
+                        Double.parseDouble(weathers[7].split("\\s+")[3])))
+                .wcAt12((int) convertTempToWc(Double.parseDouble(weathers[10].split("\\s+")[11]),
+                        Double.parseDouble(weathers[10].split("\\s+")[3])))
+                .wcAt15((int) convertTempToWc(Double.parseDouble(weathers[13].split("\\s+")[11]),
+                        Double.parseDouble(weathers[13].split("\\s+")[3])))
+                .wcAt18((int) convertTempToWc(Double.parseDouble(weathers[16].split("\\s+")[11]),
+                        Double.parseDouble(weathers[16].split("\\s+")[3])))
+                .wcAt21((int) convertTempToWc(Double.parseDouble(weathers[19].split("\\s+")[11]),
+                        Double.parseDouble(weathers[19].split("\\s+")[3])))
+                .wcAt24((int) convertTempToWc(Double.parseDouble(weathers[22].split("\\s+")[11]),
+                        Double.parseDouble(weathers[22].split("\\s+")[3])))
+                .build();
+    }
+
+    public List<WeatherGraphInfo> getWeatherGraphInfo(Location location) {
+        String rid = location.getRid();
+        Document httpResponse = getCrawling(
                 UriComponentsBuilder
                         .fromUriString(todayUrl)
                         .queryParam("rid", rid)
@@ -168,126 +250,18 @@ public class WeatherUtil {
         return weatherGraphInfoList;
     }
 
-    public WindChillDto getWindChill(String outfitDate, Location outfitLocation) {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-        LocalDate formattedOutfitDate;
+    public Document getCrawling(String url) {
+        Connection conn = Jsoup.connect(url);
         try {
-            formattedOutfitDate = LocalDate.parse(outfitDate.substring(0, 10), formatter);
-        } catch (DateTimeParseException | StringIndexOutOfBoundsException ex) {
-            throw new InvalidDateException("잘못된 형식의 날짜가 입력되었습니다.");
-        }
-        try {
-            if (formattedOutfitDate.isEqual(LocalDate.now())) {
-                //오늘이면
-                return getTodayWindChill(outfitLocation);
-            } else if (formattedOutfitDate.isBefore(LocalDate.now())) {
-                //과거이면
-                return getPastWindChill(outfitDate, outfitLocation);
-            } else {
-                throw new InvalidDateException("미래의 날짜가 입력되었습니다.");
-            }
-        } catch (Exception ex) {
-            throw new CrawlingException("날씨 정보를 가져오는데 실패했습니다.");
+            return conn.get();
+        } catch (IOException e) {
+            throw new CrawlingException("정보를 크롤링해오는데 실패했습니다.");
         }
     }
 
-    public WindChillDto getTodayWindChill(Location outfitLocation) {
-        String rid = ridMap.get(outfitLocation.getValue());
-        Document httpResponse = httpConn.getCrawling(
-                UriComponentsBuilder
-                        .fromUriString(todayUrl)
-                        .queryParam("rid", rid)
-                        .toUriString()
-        );
-        Element element1 = httpResponse.select("table").select("[bgcolor=#BCBFC2]").get(2);
-        Element element2 = element1.select("tr").select("[bgcolor=#ffffff]").get(8);
-        Element element3 = element1.select("tr").select("[bgcolor=#ffffff]").get(10);
-        String[] temp = element2.text().trim().split(" ");
-        String[] velocity = element3.text().trim().split(" ");
-
-        try {
-            return WindChillDto.builder()
-                    .wcAt6((int) tempToWc(Double.parseDouble(temp[2]), Double.parseDouble(velocity[2])))
-                    .wcAt9((int) tempToWc(Double.parseDouble(temp[3]), Double.parseDouble(velocity[3])))
-                    .wcAt12((int) tempToWc(Double.parseDouble(temp[4]), Double.parseDouble(velocity[4])))
-                    .wcAt15((int) tempToWc(Double.parseDouble(temp[5]), Double.parseDouble(velocity[5])))
-                    .wcAt18((int) tempToWc(Double.parseDouble(temp[6]), Double.parseDouble(velocity[6])))
-                    .wcAt21((int) tempToWc(Double.parseDouble(temp[7]), Double.parseDouble(velocity[7])))
-                    .wcAt24((int) tempToWc(Double.parseDouble(temp[8]), Double.parseDouble(velocity[8])))
-                    .build();
-        } catch (IndexOutOfBoundsException ex) {
-            throw new CrawlingException("오늘 체감 온도를 가져오는데 실패했습니다. 날씨 정보는 있지만 충분하지 않습니다.");
-        } catch (NumberFormatException ex) {
-            throw new CrawlingException("오늘 체감 온도를 가져오는데 실패했습니다. 날씨 정보가 숫자가 아닙니다.");
-        }
+    public static double convertTempToWc(double temp, double velocity) {
+        return 13.12 + 0.6215 * temp - 11.37 * Math.pow(velocity, 0.16) + 0.3965 * Math.pow(velocity, 0.16) * temp;
     }
-
-    private WindChillDto getPastWindChill(String outfitDate, Location outfitLocation) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate date = LocalDate.parse(outfitDate.substring(0, 10), formatter);
-        LocalDate nextDay = date.plusDays(1);
-        String uri = UriComponentsBuilder
-                .fromUriString("https://apihub.kma.go.kr")
-                .path("/api/typ01/url/kma_sfctm3.php")
-                .queryParam("tm1", date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0600")
-                .queryParam("tm2", nextDay.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "0000")
-                .queryParam("stn", jijumIdMap.get(outfitLocation.getValue()))
-                .queryParam("authKey", authKey)
-                .toUriString();
-        String response = new RestTemplate().getForEntity(uri, String.class).getBody();
-        String[] weathers = response.split("\n");
-
-        return WindChillDto.builder()
-                .wcAt6((int) tempToWc(Double.parseDouble(weathers[4].split("\\s+")[11]),
-                        Double.parseDouble(weathers[4].split("\\s+")[3])))
-                .wcAt9((int) tempToWc(Double.parseDouble(weathers[7].split("\\s+")[11]),
-                        Double.parseDouble(weathers[7].split("\\s+")[3])))
-                .wcAt12((int) tempToWc(Double.parseDouble(weathers[10].split("\\s+")[11]),
-                        Double.parseDouble(weathers[10].split("\\s+")[3])))
-                .wcAt15((int) tempToWc(Double.parseDouble(weathers[13].split("\\s+")[11]),
-                        Double.parseDouble(weathers[13].split("\\s+")[3])))
-                .wcAt18((int) tempToWc(Double.parseDouble(weathers[16].split("\\s+")[11]),
-                        Double.parseDouble(weathers[16].split("\\s+")[3])))
-                .wcAt21((int) tempToWc(Double.parseDouble(weathers[19].split("\\s+")[11]),
-                        Double.parseDouble(weathers[19].split("\\s+")[3])))
-                .wcAt24((int) tempToWc(Double.parseDouble(weathers[22].split("\\s+")[11]),
-                        Double.parseDouble(weathers[22].split("\\s+")[3])))
-                .build();
-    }
-
-    /**
-     * 과거 날씨에 연관된 지역 id의 HashMap
-     */
-    public static final Map<String, String> jijumIdMap = new HashMap<>() {{
-        put("서울경기", "108"); //서울
-        put("강원영서", "101"); //춘천
-        put("강원영동", "105"); //강릉
-        put("충청북도", "131"); //청주
-        put("충청남도", "133"); //대전
-        put("전라북도", "146"); //전주
-        put("전라남도", "156"); //광주
-        put("경상북도", "143"); //대구
-        put("경상남도", "159"); //부산
-        put("제주도", "184"); //제주
-        put("울릉독도", "115"); //울릉
-    }};
-
-    /**
-     * 현재 날씨에 연관된 지역 id의 HashMap
-     */
-    public static final Map<String, String> ridMap = new HashMap<>() {{
-        put("서울경기", "0101010000"); //서울
-        put("강원영서", "0301030101"); //춘천
-        put("강원영동", "0401020101"); //강릉
-        put("충청북도", "0601030101"); //청주
-        put("충청남도", "0701010100"); //대전
-        put("전라북도", "0801030101"); //전주
-        put("전라남도", "0901010100"); //광주
-        put("경상북도", "1001010100"); //대구
-        put("경상남도", "1101010100"); //부산
-        put("제주도", "1301030101"); //제주
-        put("울릉독도", "0501010101"); //울릉
-    }};
 
     /**
      * 과거 날씨에서 날씨 설명에 대응하는 skyCondition Map
