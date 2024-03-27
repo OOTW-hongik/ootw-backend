@@ -29,6 +29,8 @@ public class JwtUtil {
 
     private static String expirationTimeHour;
 
+    //cannot field inject to static properties
+    //@Value can use on setter
     @Value("${jwt.secret_key}")
     public void setSecretKey(String secretKey) {
         JwtUtil.secretKey = secretKey;
@@ -54,41 +56,7 @@ public class JwtUtil {
                 .compact();
     }
 
-//    public boolean validateToken(String token) {
-//        if (!StringUtils.hasText(token)) {
-//            throw new AppException(ErrorCode.JWT_TOKEN_NOT_EXISTS);
-//        }
-//        if(isLogout(token)){
-//            throw new AppException(ErrorCode.JWT_TOKEN_EXPIRED);
-//        }
-//        try {
-//            Claims claims = Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(token).getBody();
-//            return true;
-//        } catch (SignatureException | MalformedJwtException e) {
-//            throw new AppException(ErrorCode.WRONG_JWT_TOKEN);
-//        } catch (ExpiredJwtException e) {
-//            throw new AppException(ErrorCode.JWT_TOKEN_EXPIRED);
-//        }
-//    }
-
-    public static Long getExpiration(String token) {
-        Date expiration = getClaims(token).getExpiration();
-        return expiration.getTime() - new Date().getTime();
-    }
-
-    public static String getEmailFromToken(String token) {
-        return (String) getClaims(token).get("email");
-    }
-
-    public static String getRoleFromToken(String token) {
-        return (String) getClaims(token).get("role");
-    }
-
-    public static Claims getClaims(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-    }
-
-    public static String resolveAccessToken(HttpServletRequest request) {
+    public static String resolveToken(HttpServletRequest request) {
         String jwtHeader = request.getHeader("Authorization");
         if (jwtHeader != null && jwtHeader.startsWith("Bearer ")) {
             return jwtHeader.replace("Bearer ", "");
@@ -97,31 +65,21 @@ public class JwtUtil {
         }
     }
 
-    public static Authentication getAuthentication(String accessToken) {
-        // 토큰 복호화
-        Claims claims = parseClaims(accessToken);
-
-        if (claims.get(AUTHORITIES_KEY) == null) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
-        }
-
-        // 클레임에서 권한 정보 가져오기
+    public static Authentication getAuthentication(String token) {
+        Claims claims = parseClaims(token);
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-
-        // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = new User(claims.getSubject(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     private static Claims parseClaims(String accessToken) {
-        try {
-            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(accessToken).getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(accessToken)
+                .getBody();
     }
 }
