@@ -255,7 +255,7 @@ public class WeatherUtil {
         try {
             return conn.get();
         } catch (IOException e) {
-            throw new CrawlingException("정보를 크롤링해오는데 실패했습니다.");
+            throw new CrawlingException("날씨 정보를 크롤링해오는데 실패했습니다.");
         }
     }
 

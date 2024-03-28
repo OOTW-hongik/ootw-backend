@@ -6,100 +6,144 @@ import OOTWhongik.OOTW.outfit.exception.CrawlingException;
 import OOTWhongik.OOTW.outfit.exception.InvalidDateException;
 import OOTWhongik.OOTW.outfit.exception.OutfitNotFoundException;
 import OOTWhongik.OOTW.outfit.exception.UnauthorizedOutfitAccessException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDateTime;
 
+@Slf4j
 @RestControllerAdvice
 public class RestControllerAdvisor {
-
     @ExceptionHandler(UnauthorizedClothesAccessException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public String handleUnauthorizedClothesAccessException() throws JsonProcessingException {
-        return responseJsonMessage("옷의 소유주가 아닙니다.");
+    public ResponseEntity<ErrorResponse> handleUnauthorizedClothesAccessException
+            (UnauthorizedClothesAccessException ex, HttpServletRequest request) {
+        log.error("UnauthorizedClothesAccessException occurred: {}", ex.getMessage());
+        String errorMessage = "옷의 소유주가 아닙니다.";
+        return handleRuntimeException(errorMessage, request, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleCategoryNotFoundException() throws JsonProcessingException {
-        return responseJsonMessage("카테고리 입력이 옳지 않습니다.");
+    public ResponseEntity<ErrorResponse> handleCategoryNotFoundException
+            (CategoryNotFoundException ex, HttpServletRequest request) {
+        log.error("CategoryNotFoundException occurred: {}", ex.getMessage());
+        String errorMessage = "카테고리를 찾을 수 없습니다.";
+        return handleRuntimeException(errorMessage, request, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(SizeLimitExceededException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleSizeLimitExceededException() throws JsonProcessingException {
-        return responseJsonMessage("사진의 크기가 너무 큽니다.");
+    public ResponseEntity<ErrorResponse> handleSizeLimitExceededException
+            (SizeLimitExceededException ex, HttpServletRequest request)  {
+        log.error("SizeLimitExceededException occurred: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST,
+                "사진의 크기가 너무 큽니다.",
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(FileUploadException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleFileUploadException() throws JsonProcessingException {
-        return responseJsonMessage("파일 업로드에 실패했습니다.");
+    public ResponseEntity<ErrorResponse> handleFileUploadException
+            (FileUploadException ex, HttpServletRequest request)  {
+        log.error("FileUploadException occurred: {}", ex.getMessage());
+        String errorMessage = "파일 업로드에 실패했습니다.";
+        return handleRuntimeException(errorMessage, request, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(ClothesNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleClothesNotFoundException() throws JsonProcessingException {
-        return responseJsonMessage("옷을 찾을 수 없습니다.");
+    public ResponseEntity<ErrorResponse> handleClothesNotFoundException
+            (ClothesNotFoundException ex, HttpServletRequest request)  {
+        log.error("ClothesNotFoundException occurred: {}", ex.getMessage());
+        String errorMessage = "옷을 찾을 수 없습니다.";
+        return handleRuntimeException(errorMessage, request, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ClothesInUseException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleClothesInUseException() throws JsonProcessingException {
-        return responseJsonMessage("옷이 쓰이고 있는 착장이 있습니다. 옷이 쓰이고 있는 착장들을 모두 삭제한 후 시도해주십시오.");
+    public ResponseEntity<ErrorResponse> handleClothesInUseException
+            (ClothesInUseException ex, HttpServletRequest request)  {
+        log.error("ClothesInUseException occurred: {}", ex.getMessage());
+        String errorMessage = "옷이 쓰이고 있는 착장이 있습니다.";
+        return handleRuntimeException(errorMessage, request, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(LocationNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleLocationNotFoundException() throws JsonProcessingException {
-        return responseJsonMessage("올바르지 않은 지역명을 입력했습니다.");
+    public ResponseEntity<ErrorResponse> handleLocationNotFoundException
+            (LocationNotFoundException ex, HttpServletRequest request)  {
+        log.error("LocationNotFoundException occurred: {}", ex.getMessage());
+        String errorMessage = "지역을 찾을 수 없습니다.";
+        return handleRuntimeException(errorMessage, request, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(InvalidDateException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleInvalidDateException() throws JsonProcessingException {
-        return responseJsonMessage("잘못된 형식의 날짜를 입력했습니다.");
+    public ResponseEntity<ErrorResponse> handleInvalidDateException
+            (InvalidDateException ex, HttpServletRequest request)  {
+        log.error("InvalidDateException occurred: {}", ex.getMessage());
+        String errorMessage = "잘못된 날짜입니다. (날짜가 미래이거나 잘못된 형식입니다.)";
+        return handleRuntimeException(errorMessage, request, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(OutfitNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleOutfitNotFoundException() throws JsonProcessingException {
-        return responseJsonMessage("착장을 찾을 수 없습니다.");
+    public ResponseEntity<ErrorResponse> handleOutfitNotFoundException
+            (OutfitNotFoundException ex, HttpServletRequest request)  {
+        log.error("OutfitNotFoundException occurred: {}", ex.getMessage());
+        String errorMessage = "착장을 찾을 수 없습니다.";
+        return handleRuntimeException(errorMessage, request, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UnauthorizedOutfitAccessException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public String handleUnauthorizedOutfitAccessException() throws JsonProcessingException {
-        return responseJsonMessage("착장의 소유주가 아닙니다.");
+    public ResponseEntity<ErrorResponse> handleUnauthorizedOutfitAccessException
+            (UnauthorizedOutfitAccessException ex, HttpServletRequest request)  {
+        log.error("UnauthorizedOutfitAccessException occurred: {}", ex.getMessage());
+        String errorMessage = "착장의 소유주가 아닙니다.";
+        return handleRuntimeException(errorMessage, request, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(CrawlingException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleCrawlingException() throws JsonProcessingException {
-        return responseJsonMessage("날씨 정보를 가져오는데 실패했습니다.");
+    public ResponseEntity<ErrorResponse> handleCrawlingException
+            (CrawlingException ex, HttpServletRequest request)  {
+        log.error("CrawlingException occurred: {}", ex.getMessage());
+        String errorMessage = "날씨 정보를 가져오는데 실패했습니다.";
+        return handleRuntimeException(errorMessage, request, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleMethodArgumentNotValidException(MethodArgumentNotValidException ex)
-            throws JsonProcessingException {
-        return responseJsonMessage(
-                Objects.requireNonNullElse(
-                        ex.getBindingResult().getFieldError().getDefaultMessage(), "입력이 잘못되었습니다."));
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException
+            (MethodArgumentNotValidException ex, HttpServletRequest request)  {
+        log.error("MethodArgumentNotValidException occurred: {}", ex.getMessage());
+
+        String message;
+        if (ex.getBindingResult().getFieldErrors().isEmpty()) {
+            message = ex.getMessage();
+        } else {
+            message = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        }
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST,
+                message,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    private String responseJsonMessage(String message) throws JsonProcessingException {
-        Map<String, String> map = new HashMap<>();
-        map.put("message", message);
-        return new ObjectMapper().writeValueAsString(map);
+    public ResponseEntity<ErrorResponse> handleRuntimeException
+            (String errorMessage, HttpServletRequest request, HttpStatus status) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                status,
+                errorMessage,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorResponse, status);
     }
 }

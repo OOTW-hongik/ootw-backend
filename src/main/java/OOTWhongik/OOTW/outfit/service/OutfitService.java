@@ -68,9 +68,9 @@ public class OutfitService {
     public void updateOutfit(Long outfitId, OutfitRequest outfitRequest) {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
         Outfit outfit = outfitRepository.findById(outfitId)
-                .orElseThrow(() -> new OutfitNotFoundException("착장을 찾을 수 없습니다."));
+                .orElseThrow(() -> new OutfitNotFoundException("id가 " + outfitId + "인 착장을 찾지 못했습니다."));
         if (!member.isOwner(outfit)) {
-            throw new UnauthorizedOutfitAccessException("착장의 소유주가 아닙니다.");
+            throw new UnauthorizedOutfitAccessException("id가 " + outfitId + "인 착장의 소유주가 아닙니다.");
         }
 
         List<Clothes> clothesList = Stream.of(
@@ -142,9 +142,9 @@ public class OutfitService {
     public OutfitDetailResponse getOutfitDetail(Long outfitId) {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
         Outfit outfit = outfitRepository.findById(outfitId)
-                .orElseThrow(() -> new OutfitNotFoundException("착장을 찾을 수 없습니다."));
+                .orElseThrow(() -> new OutfitNotFoundException("id가 " + outfitId + "인 착장을 찾지 못했습니다."));
         if (!member.isOwner(outfit)) {
-            throw new UnauthorizedOutfitAccessException("착장의 소유주가 아닙니다.");
+            throw new UnauthorizedOutfitAccessException("id가 " + outfitId + "인 착장의 소유주가 아닙니다.");
         }
         return OutfitDetailResponse.builder()
                 .outfit(outfit)
@@ -155,9 +155,9 @@ public class OutfitService {
     public void deleteOutfit(Long outfitId) {
         Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
         Outfit outfit = outfitRepository.findById(outfitId)
-                .orElseThrow(() -> new OutfitNotFoundException("착장을 찾을 수 없습니다."));
+                .orElseThrow(() -> new OutfitNotFoundException("id가 " + outfitId + "인 착장을 찾지 못했습니다."));
         if (!member.isOwner(outfit)) {
-            throw new UnauthorizedOutfitAccessException("착장의 소유주가 아닙니다.");
+            throw new UnauthorizedOutfitAccessException("id가 " + outfitId + "인 착장의 소유주가 아닙니다.");
         }
         outfit.getClothesOutfitList().stream()
                 .map(ClothesOutfit::getId)

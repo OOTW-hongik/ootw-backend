@@ -1,12 +1,8 @@
 package OOTWhongik.OOTW.clothes.exception;
 
 public class FileUploadException extends RuntimeException{
-
-    public FileUploadException() {
-    }
-
-    public FileUploadException(String s) {
-        super(s);
+    public FileUploadException(String message) {
+        super(message);
     }
 
     @Override

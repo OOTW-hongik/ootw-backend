@@ -26,7 +26,7 @@ public class PhotoService {
         try {
             uploadImageUrl = s3FileComponent.upload(file, "ootw", Long.toString(clothesId));
         } catch (Exception e) {
-            throw new FileUploadException();
+            throw new FileUploadException("파일 업로드에 실패했습니다.");
         }
         Photo photo = Photo.builder()
                 .originalFileName(file.getOriginalFilename())

@@ -1,10 +1,6 @@
 package OOTWhongik.OOTW.outfit.exception;
 
 public class CrawlingException extends RuntimeException {
-
-    public CrawlingException() {
-    }
-
     public CrawlingException(String message) {
         super(message);
     }

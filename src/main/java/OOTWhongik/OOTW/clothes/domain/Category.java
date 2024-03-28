@@ -21,6 +21,6 @@ public enum Category {
         return Arrays.stream(values())
                 .filter(category -> category.name.equals(name))
                 .findAny()
-                .orElseThrow(() -> new CategoryNotFoundException(name + "에 해당되는 카테고리를 찾지 못했습니다."));
+                .orElseThrow(() -> new CategoryNotFoundException("카테고리 입력이 옳지 않습니다."));
     }
 }

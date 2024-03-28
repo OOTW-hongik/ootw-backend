@@ -70,8 +70,8 @@ public class ClothesService {
         if (!member.contains(clothes)) {
             throw new UnauthorizedClothesAccessException("해당 유저는 id가" + clothesId + "인 옷을 소유하고 있지 않습니다.");
         }
-        if (clothes.getClothesOutfitList().size() > 0)
-            throw new ClothesInUseException("옷이 쓰이고 있는 착장이 있습니다.");
+        if (!clothes.getClothesOutfitList().isEmpty())
+            throw new ClothesInUseException("옷이 쓰이고 있는 착장이 있어 삭제할 수 없습니다.");
         photoService.deletePhoto(clothes.getPhoto());
         clothesRepository.delete(clothes);
     }
