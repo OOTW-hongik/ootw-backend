@@ -28,7 +28,7 @@ public class ClothesService {
     public Long saveClothes(ClothesRequest clothesRequest, MultipartFile file) {
         Long memberId = SecurityUtil.getCurrentMemberId();
         Clothes clothes = clothesRequest.toEntity(); // 사진 아직 저장되지 않음
-        clothes.addMember(memberRepository.findById(memberId).get());
+        clothes.addMember(memberRepository.getReferenceById(memberId));
         clothesRepository.save(clothes);
         Photo photo = photoService.uploadPhoto(file, clothes.getId());
         clothes.setPhoto(photo);
@@ -37,7 +37,8 @@ public class ClothesService {
 
     @Transactional
     public ClothesResponse updateClothes(Long clothesId, ClothesRequest clothesRequest, MultipartFile file) throws Exception {
-        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.getReferenceById(memberId);
         Clothes clothes = clothesRepository.findById(clothesId)
                 .orElseThrow(() -> new ClothesNotFoundException("id가 " + clothesId + "인 옷을 찾지 못했습니다."));
         if (!member.contains(clothes)) {
@@ -52,7 +53,8 @@ public class ClothesService {
 
     @Transactional
     public ClothesResponse updateClothes(Long clothesId, ClothesRequest clothesRequest) {
-        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.getReferenceById(memberId);
         Clothes clothes = clothesRepository.findById(clothesId)
                 .orElseThrow(() -> new ClothesNotFoundException("id가 " + clothesId + "인 옷을 찾지 못했습니다."));
         if (!member.contains(clothes)) {
@@ -64,7 +66,8 @@ public class ClothesService {
 
     @Transactional
     public void deleteClothes(Long clothesId) {
-        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.getReferenceById(memberId);
         Clothes clothes = clothesRepository.findById(clothesId)
                 .orElseThrow(() -> new ClothesNotFoundException("id가 " + clothesId + "인 옷을 찾지 못했습니다."));
         if (!member.contains(clothes)) {

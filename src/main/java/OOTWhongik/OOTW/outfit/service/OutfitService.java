@@ -47,7 +47,7 @@ public class OutfitService {
     @Transactional
     public Long saveOutfit(OutfitRequest outfitRequest) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        Member owner = memberRepository.findById(memberId).get();
+        Member owner = memberRepository.getReferenceById(memberId);
         WindChillDto windChillDto =
                 weatherUtil.getWindChill(outfitRequest.getOutfitDate(), outfitRequest.getOutfitLocation());
         List<Clothes> clothesList = Stream.of(
@@ -66,7 +66,8 @@ public class OutfitService {
 
     @Transactional
     public void updateOutfit(Long outfitId, OutfitRequest outfitRequest) {
-        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.getReferenceById(memberId);
         Outfit outfit = outfitRepository.findById(outfitId)
                 .orElseThrow(() -> new OutfitNotFoundException("id가 " + outfitId + "인 착장을 찾지 못했습니다."));
         if (!member.isOwner(outfit)) {
@@ -132,7 +133,7 @@ public class OutfitService {
 
     public OutfitListResponse getOutfitList(Optional<Integer> quantity) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberRepository.findById(memberId).get();
+        Member member = memberRepository.getReferenceById(memberId);
         String name = member.getName();
         List<OutfitSummary> outfitSummaryList = getOutfitSummaryList(member, quantity);
         boolean isEnd = member.getOutfitList().size() >= outfitSummaryList.size();
@@ -140,7 +141,8 @@ public class OutfitService {
     }
 
     public OutfitDetailResponse getOutfitDetail(Long outfitId) {
-        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.getReferenceById(memberId);
         Outfit outfit = outfitRepository.findById(outfitId)
                 .orElseThrow(() -> new OutfitNotFoundException("id가 " + outfitId + "인 착장을 찾지 못했습니다."));
         if (!member.isOwner(outfit)) {
@@ -153,7 +155,8 @@ public class OutfitService {
 
     @Transactional
     public void deleteOutfit(Long outfitId) {
-        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).get();
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        Member member = memberRepository.getReferenceById(memberId);
         Outfit outfit = outfitRepository.findById(outfitId)
                 .orElseThrow(() -> new OutfitNotFoundException("id가 " + outfitId + "인 착장을 찾지 못했습니다."));
         if (!member.isOwner(outfit)) {

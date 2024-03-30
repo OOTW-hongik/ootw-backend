@@ -38,7 +38,7 @@ public class ClosetService {
 
     public ClosetResponse getCloset(String categoryName, boolean hidden) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberRepository.findById(memberId).get();
+        Member member = memberRepository.getReferenceById(memberId);
         List<Clothes> clothesList =
                 clothesRepository.findAllByMemberAndCategory(member, Category.findByName(categoryName));
 
@@ -59,7 +59,7 @@ public class ClosetService {
 
     public ClothesDetailResponse getClothes(Long clothesId) {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        Member member = memberRepository.findById(memberId).get();
+        Member member = memberRepository.getReferenceById(memberId);
         Clothes clothes = clothesRepository.findById(clothesId)
                 .orElseThrow(() -> new ClothesNotFoundException("id가 " + clothesId + "인 옷을 찾지 못했습니다."));
         if (!member.contains(clothes)) {
