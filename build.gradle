@@ -33,7 +33,7 @@ dependencies {
 	//swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
 	//aws
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.2' // TODO : upgrade to 3.1.1
 	//jsoup
 	implementation 'org.jsoup:jsoup:1.15.4'
 	//jwt
